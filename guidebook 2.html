@@ -36,10 +36,24 @@
             position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 8px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
+        /* 終極列印隱藏設定 */
         @media print { 
-            .no-print { display: none !important; } 
-            .remove-photo-btn { display: none !important; }
-            .live-caption-box::placeholder { color: transparent !important; }
+            .no-print, 
+            .remove-photo-btn, 
+            button[class*="remove-photo-btn"], 
+            .photo-container button { 
+                display: none !important; 
+                opacity: 0 !important; 
+                visibility: hidden !important; 
+                width: 0 !important; 
+                height: 0 !important; 
+                pointer-events: none !important;
+                position: absolute !important;
+                z-index: -9999 !important;
+            }
+            .live-caption-box::placeholder { 
+                color: transparent !important; 
+            }
             @page { size: A4; margin: 12mm 10mm; }
             article { page-break-after: always; padding-top: 30px; position: relative; }
             .moment-col { width: 48% !important; display: inline-block !important; margin-right: 2% !important; margin-bottom: 20px; vertical-align: top; }
@@ -200,13 +214,25 @@
         let remoteData = {};
 
         const statusEl = document.createElement('div');
-        statusEl.style.cssText = 'position:fixed;top:15px;left:15px;z-index:9999;background:white;padding:10px 20px;border-radius:30px;font-size:12px;font-family:sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;font-weight:bold;transition:all 0.3s;';
+        statusEl.className = 'no-print';
+        // 將預設的 opacity 改為 0，並取消點擊事件，讓它一開始就隱形
+        statusEl.style.cssText = 'position:fixed;top:15px;left:15px;z-index:9999;background:white;padding:10px 20px;border-radius:30px;font-size:12px;font-family:sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;font-weight:bold;transition:all 0.5s ease-in-out; opacity:0; pointer-events:none;';
         statusEl.innerHTML = '<div id="status-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;"></div><span id="status-text">初始化雲端...</span>';
         document.body.appendChild(statusEl);
 
         function setSyncStatus(status) {
             const dot = document.getElementById('status-dot');
             const txt = document.getElementById('status-text');
+            
+            // 只有在發生錯誤 (error) 或本地模式 (local) 時才顯示氣泡
+            if (status.startsWith('error') || status === 'local') {
+                statusEl.style.opacity = '1';
+                statusEl.style.pointerEvents = 'auto';
+            } else {
+                statusEl.style.opacity = '0';
+                statusEl.style.pointerEvents = 'none';
+            }
+
             if (status === 'syncing') { dot.style.background = '#3b82f6'; txt.innerText = '同步中...'; }
             else if (status === 'saved') { dot.style.background = '#10b981'; txt.innerText = '已儲存到雲端'; setTimeout(()=>setSyncStatus('idle'), 3000); }
             else if (status === 'idle') { dot.style.background = '#10b981'; txt.innerText = '雲端已連線'; }
