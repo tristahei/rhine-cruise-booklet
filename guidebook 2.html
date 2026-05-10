@@ -38,6 +38,8 @@
 
         @media print { 
             .no-print { display: none !important; } 
+            .remove-photo-btn { display: none !important; }
+            .live-caption-box::placeholder { color: transparent !important; }
             @page { size: A4; margin: 12mm 10mm; }
             article { page-break-after: always; padding-top: 30px; position: relative; }
             .moment-col { width: 48% !important; display: inline-block !important; margin-right: 2% !important; margin-bottom: 20px; vertical-align: top; }
@@ -312,7 +314,7 @@
                 div.innerHTML = `
                     <div class="photo-container bg-white p-2.5 border shadow-md relative group">
                         <img src="${base64}" class="w-full aspect-square object-cover" />
-                        <button class="remove-photo-btn no-print" data-day="${day}" data-idx="${i}">
+                        <button class="remove-photo-btn no-print print:hidden" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
