@@ -36,13 +36,76 @@
             position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 8px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* 第一重防護：常規列印隱藏設定 */
+        /* 第一重防護：常規列印隱藏設定與【完美 A4 版面最佳化】 */
         @media print { 
             .no-print { display: none !important; }
-            @page { size: A4; margin: 12mm 10mm; }
-            article { page-break-after: always; padding-top: 30px; position: relative; }
-            .moment-col { width: 48% !important; display: inline-block !important; margin-right: 2% !important; margin-bottom: 20px; vertical-align: top; }
-            .moment-col:nth-child(2n) { margin-right: 0 !important; }
+            @page { size: A4 portrait; margin: 10mm; }
+            
+            /* 將封面與引言整合並獨立為第一頁 */
+            header { padding-top: 2rem !important; border-bottom-width: 4px !important; margin-bottom: 2rem !important; }
+            section.max-w-3xl { page-break-after: always !important; break-after: page !important; margin-bottom: 0 !important; }
+            
+            /* 讓每一天嚴格固定在一頁 A4 */
+            article { 
+                page-break-after: always !important; 
+                break-after: always !important; 
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                padding-top: 8mm !important; 
+                margin-bottom: 0 !important; 
+                height: 277mm !important; /* 強制 A4 內容高度 (297mm - 20mm 上下邊距) */
+                overflow: hidden !important; /* 避免任何內容超出單頁 */
+                display: flex;
+                flex-direction: column;
+            }
+            
+            /* 縮小上方標題與留白，把空間全部讓給照片 */
+            .text-8xl, .md\:text-\[7rem\] { font-size: 4rem !important; line-height: 1 !important; }
+            .text-5xl { font-size: 2.2rem !important; line-height: 1.2 !important; }
+            .gap-12 { gap: 1.5rem !important; }
+            .mb-10 { margin-bottom: 1rem !important; }
+            .mb-12 { margin-bottom: 1rem !important; }
+            h4.mb-12 { margin-bottom: 0.5rem !important; } /* Signature Moments 標題下緣 */
+            .mt-20 { margin-top: 1rem !important; }
+            .pt-12 { padding-top: 1rem !important; border-top-width: 2px !important; }
+            .leading-\[2\.6\] { line-height: 1.6 !important; font-size: 14px !important; }
+
+            /* 強制雙欄排版 (避免手機預覽時變為單欄) */
+            .flex-col.md\:flex-row { flex-direction: row !important; align-items: flex-start !important; }
+            .md\:w-\[42\%\] { width: 40% !important; }
+            .flex-1 { flex: 1 !important; padding-right: 1rem !important; }
+            
+            /* 主圖大小控制 (縮小以節省空間) */
+            .photo-container.min-h-\[220px\] { min-height: 0 !important; }
+            .md\:w-\[42\%\] img { max-height: 180px !important; object-fit: cover !important; }
+
+            /* 【重點】專屬回憶網格：極大化簽名照片 */
+            div[id^="moments-"] {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 15px !important;
+                width: 100% !important;
+            }
+            .moment-col {
+                width: 100% !important;
+                margin: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            .moment-col .photo-container {
+                padding: 5px !important;
+                width: 100% !important;
+            }
+            /* 顯著放大您的專屬回憶照片 */
+            .moment-col .photo-container img {
+                width: 100% !important;
+                height: 250px !important; 
+                object-fit: cover !important;
+            }
+            .live-caption-box {
+                font-size: 12px !important;
+                margin-top: 4px !important;
+            }
         }
 
         /* 第二重防護：JavaScript 列印狀態觸發的隱藏 */
