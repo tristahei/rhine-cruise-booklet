@@ -11,22 +11,20 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts (升級為文青手寫風格) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 背景改為較深的質感灰，襯托出書本的實體感 */
         body { 
-            background-color: #e6e2d8; 
-            overflow-x: hidden;
+            background-color: #F9F7F1; 
         }
-        
+        /* 替換為文青手寫風 (霞鶩文楷) 與 英文手寫 (Caveat) */
         .font-serif { font-family: 'LXGW WenKai TC', cursive, serif; }
         .font-sans { font-family: 'Noto Sans TC', sans-serif; }
-        .font-cinzel { font-family: 'Cinzel', serif; }
-        .font-cormorant { font-family: 'Caveat', 'LXGW WenKai TC', cursive; font-size: 1.3em; letter-spacing: 0.05em; }
+        .font-cinzel { font-family: 'Cinzel', serif; } /* 保留 Premium 主標題的古典優雅 */
+        .font-cormorant { font-family: 'Caveat', 'LXGW WenKai TC', cursive; font-size: 1.3em; letter-spacing: 0.05em; } /* 英文副標與引言改為流暢手寫體 */
         
         .hidden-input { 
             position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 80; display: block; 
@@ -34,81 +32,156 @@
         .moment-col label * { pointer-events: none; }
         .no-print { display: block; }
         
+        /* Photo Removal Button Styling */
         .remove-photo-btn {
-            position: absolute; top: 6px; right: 6px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 6px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        /* 翻頁書本專用樣式 */
-        .page {
-            background-color: #F9F7F1;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
-            overflow: hidden; /* 確保內容絕對不會超出單頁邊界 */
-        }
-        .page-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* 導航按鈕動畫 */
-        .flip-nav-btn {
-            transition: all 0.3s ease;
-        }
-        .flip-nav-btn:hover {
-            transform: scale(1.1);
-            background-color: white;
+            position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 8px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         /* ==========================================
-           列印專用終極版面設定 (強制解除 3D 翻頁並完美還原 A4)
+           列印專用終極版面設定 (PDF 匯出最佳化)
            ========================================== */
         @media print { 
             .no-print { display: none !important; }
             @page { size: A4 portrait; margin: 10mm; }
             
-            body { background-color: #F9F7F1 !important; }
-            
-            /* 強制解除 StPageFlip 的 Inline Styles，讓其變回正常的上下滾動網頁 */
-            #flipbook-wrapper { display: block !important; padding: 0 !important; min-height: auto !important; }
-            #booklet-root { display: block !important; width: 100% !important; height: auto !important; transform: none !important; }
-            .stf__wrapper, .stf__block, .stf__item { 
-                display: block !important; 
-                width: 100% !important; 
-                height: auto !important; 
-                transform: none !important; 
-                position: static !important; 
-                clip-path: none !important;
-            }
-            .stf__shadow { display: none !important; }
-            
-            /* 讓每一頁還原為標準 A4 高度並強制分頁 */
-            .page {
-                display: block !important;
-                position: relative !important;
-                transform: none !important;
-                width: 100% !important;
-                height: 277mm !important; /* 嚴格 A4 內部高度 */
+            /* 【封面與引言】強制包裝在一頁 A4 內垂直置中 */
+            .cover-page {
                 page-break-after: always !important;
                 break-after: always !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-                box-shadow: none !important;
-                left: auto !important; top: auto !important; right: auto !important; bottom: auto !important;
+                height: 277mm !important; /* 嚴格限制一頁 A4 內部高度 */
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important; /* 上下完美置中 */
+                padding-top: 0 !important;
+                margin-bottom: 0 !important;
+            }
+            .cover-page header { padding-top: 0 !important; border-bottom-width: 4px !important; margin-bottom: 2rem !important; }
+            .cover-page header h1.text-7xl { font-size: 4.5rem !important; }
+            .cover-page header h1.md\:text-\[9rem\] { font-size: 6.5rem !important; }
+            .cover-page header h2 { font-size: 2rem !important; }
+            .cover-page section.max-w-3xl { page-break-after: auto !important; break-after: auto !important; margin-bottom: 0 !important; padding-top: 1rem !important; }
+            .cover-page section.max-w-3xl p { font-size: 20px !important; line-height: 2.2 !important; }
+            
+            /* 強制單頁 A4 約束 (每天的內容) */
+            article { 
+                page-break-after: always !important; 
+                break-after: always !important; 
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 0 !important; 
+                height: 277mm !important; /* 297mm - 20mm 上下邊緣 */
+                overflow: hidden !important; 
+                display: flex;
+                flex-direction: column;
             }
 
-            .page-content { padding: 0 !important; }
+            /* --------------------------------------
+               情境 1：無上傳照片的頁面 (第1天與最後1天)
+               特徵：無回憶照片，字體與主圖放到最大，填滿A4
+               -------------------------------------- */
+            article.no-moments { justify-content: center !important; padding-top: 0 !important; }
+            article.no-moments .text-8xl { font-size: 6rem !important; }
+            article.no-moments .text-5xl { font-size: 3rem !important; margin-bottom: 2rem !important; }
+            article.no-moments .content-row { height: auto !important; }
+            article.no-moments .content-text p { 
+                font-size: 21px !important; /* 放大字體 */
+                line-height: 2.4 !important; 
+                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; /* 套用手寫風格 */
+                font-style: italic !important;
+            }
+            article.no-moments .photo-wrapper { width: 50% !important; }
+            article.no-moments .photo-wrapper img { max-height: 380px !important; height: 380px !important; }
+
+            /* --------------------------------------
+               情境 2：常規有回憶照片的頁面 (第2~10天)
+               特徵：加大字型行距、文字與風景圖等高對齊、極大化4張回憶照
+               -------------------------------------- */
+            article.has-moments { padding-top: 6mm !important; }
+            article.has-moments .text-8xl { font-size: 4rem !important; line-height: 1 !important; }
+            article.has-moments .text-5xl { font-size: 2.2rem !important; line-height: 1.2 !important; }
+            
+            /* 文字與旁邊的 Photo 高度完美齊平對齊 */
+            article.has-moments .content-row { 
+                height: 185px !important; /* 固定高度基準 */
+                display: flex !important; 
+                align-items: stretch !important; /* 強制左右等高 */
+                margin-bottom: 15px !important;
+            }
+            article.has-moments .content-text { 
+                display: flex !important; 
+                flex-direction: column !important; 
+                justify-content: center !important; /* 文字垂直置中/分配 */
+            }
+            article.has-moments .content-text p { 
+                font-size: 17.5px !important; /* 顯著加大字體 */
+                line-height: 1.8 !important;  /* 行距加寬 */
+                margin: auto 0 !important;  /* 自然佔據高度 */
+                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; /* 與日期同步手寫風 */
+                font-style: italic !important;
+            }
+            /* 地點標籤保持端正不變形 */
+            article.has-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
+            article.no-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
+
+            article.has-moments .photo-wrapper { height: 100% !important; }
+            article.has-moments .photo-wrapper img { height: 100% !important; max-height: 185px !important; object-fit: cover !important; }
+
+            /* 專屬回憶網格 (4張照片極大化) */
+            div[id^="moments-"] {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px 18px !important; /* 微調間距以適應大照片 */
+                width: 100% !important;
+                margin-top: 5px !important;
+            }
+            .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; }
+            .moment-col .photo-container { padding: 4px !important; width: 100% !important; }
+            
+            /* 顯著放大您的專屬回憶照片，確保4張剛好填滿剩下的A4空間 */
+            .moment-col .photo-container img {
+                width: 100% !important;
+                height: 275px !important; /* 極大化設定 */
+                object-fit: cover !important;
+            }
+            .live-caption-box {
+                font-family: 'LXGW WenKai TC', cursive, serif !important; /* 確保列印時的註解也是手寫風 */
+                font-size: 15px !important;
+                line-height: 1.6 !important;
+                height: 35px !important;
+                overflow: hidden !important;
+                margin-top: 4px !important;
+            }
+            
+            /* 縮減其他不必要的留白 */
+            .mb-40 { margin-bottom: 0 !important; }
+            .mt-20 { margin-top: 0 !important; }
+            .pt-12 { padding-top: 5px !important; border-top-width: 1px !important; }
+            h4.mb-12 { margin-bottom: 8px !important; font-size: 1.25rem !important; }
+            .gap-12 { gap: 1.5rem !important; }
+            .mb-10 { margin-bottom: 0.8rem !important; }
+            .flex-col.md\:flex-row { flex-direction: row !important; align-items: flex-start !important; }
+            .md\:w-\[42\%\] { width: 40% !important; }
+            .flex-1 { flex: 1 !important; padding-right: 1rem !important; }
         }
 
-        /* 針對列印/匯出瞬間隱藏按鈕防護 */
-        body.is-printing .remove-photo-btn, body.is-printing .no-print { display: none !important; opacity: 0 !important; visibility: hidden !important; width: 0 !important; height: 0 !important; }
-        body.is-printing .live-caption-box::placeholder { color: transparent !important; }
+        /* 第二重防護：JavaScript 列印狀態觸發的隱藏 */
+        body.is-printing .remove-photo-btn,
+        body.is-printing .no-print {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        body.is-printing .live-caption-box::placeholder {
+            color: transparent !important;
+        }
     </style>
 </head>
-<body class="bg-[#e6e2d8] min-h-screen font-serif relative selection:bg-black selection:text-white print:bg-[#F9F7F1]">
+<body class="bg-[#F9F7F1] min-h-screen font-serif pb-20 relative selection:bg-black selection:text-white print:bg-[#F9F7F1]">
 
-    <!-- 浮動列印按鈕 -->
+    <!-- 浮動列印按鈕 (解決手機版 PDF 隱藏失效的問題) -->
     <div class="no-print fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[100] flex flex-col items-end gap-4">
         <button id="mobile-print-btn" class="flex items-center gap-3 px-5 py-3 md:px-6 md:py-4 rounded-full shadow-2xl transition-all bg-[#8B2635] hover:scale-105 text-white focus:outline-none">
             <i data-lucide="printer" class="w-5 h-5 text-[#D4AF37]"></i>
@@ -116,31 +189,63 @@
         </button>
     </div>
 
-    <!-- 翻頁導航按鈕 (桌面版顯示) -->
-    <button id="btn-prev" class="no-print flip-nav-btn hidden md:flex fixed left-8 top-1/2 -translate-y-1/2 z-[100] bg-white/70 backdrop-blur text-[#8B2635] p-4 rounded-full shadow-lg border border-gray-200 focus:outline-none">
-        <i data-lucide="chevron-left" class="w-8 h-8"></i>
-    </button>
-    <button id="btn-next" class="no-print flip-nav-btn hidden md:flex fixed right-8 top-1/2 -translate-y-1/2 z-[100] bg-white/70 backdrop-blur text-[#8B2635] p-4 rounded-full shadow-lg border border-gray-200 focus:outline-none">
-        <i data-lucide="chevron-right" class="w-8 h-8"></i>
-    </button>
-
-    <!-- 書本外框容器 -->
-    <div id="flipbook-wrapper" class="w-full min-h-screen flex items-center justify-center py-4 md:py-10 overflow-hidden">
+    <!-- Dynamic Container for the Booklet -->
+    <div id="booklet-root" class="max-w-7xl mx-auto relative">
         
-        <!-- 動態生成的書本內容 (StPageFlip 容器) -->
-        <div id="booklet-root"></div>
+        <!-- 將封面與引言包裹起來，確保列印時鎖死在同一頁 -->
+        <div class="cover-page min-h-screen flex flex-col justify-center">
+            <!-- Header -->
+            <header class="px-6 pt-16 pb-16 max-w-7xl mx-auto text-center border-b-[6px] border-double border-[#1a1a1a] mb-12">
+                <p class="font-cormorant italic text-xl text-gray-500 mb-4 tracking-widest">Escorted by Carl Chan</p>
+                <h1 class="text-7xl md:text-[9rem] font-cinzel font-bold uppercase tracking-tighter mb-2 leading-none text-[#5D4037]">Premium</h1>
+                <h1 class="text-4xl md:text-6xl font-cinzel font-semibold uppercase tracking-[0.4em] mb-8 text-[#5D4037]">Holidays</h1>
+                <h2 class="text-3xl md:text-4xl font-serif font-black tracking-[0.3em] mb-10 text-[#8B2635]">萊茵河之旅 • 時光紀實</h2>
+                <div class="flex flex-wrap justify-center md:justify-between items-center border-t-2 border-b-2 border-[#1a1a1a] py-6 mt-8 gap-6 px-6">
+                    <span class="font-sans font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3">
+                        <i data-lucide="newspaper" class="w-[18px] h-[18px] text-[#8B2635]"></i> Viva Cruises
+                    </span>
+                    <span class="font-serif italic text-2xl md:text-3xl font-black">@康爺帶您嘆世界</span>
+                    <span class="font-sans font-black text-[11px] uppercase tracking-[0.3em]">11 Days / 德 • 法 • 瑞</span>
+                </div>
+            </header>
+
+            <!-- Intro Section -->
+            <section class="max-w-3xl mx-auto px-8 text-center">
+                <p class="font-serif text-2xl leading-[2.6] text-gray-800 italic tracking-wide">
+                    「致我最尊貴的貴賓們：<br/><br/>
+                    旅程的長度可以用天數計算，但我們共同創造的回憶，卻是超越時間的無價之寶。這本紀念冊，是我為您準備的心意。這裡記錄了萊茵河畔的微風，與我們舉杯共飲的歡笑。<br/><br/>
+                    請在此上傳您的視角，讓我為您的每一個精彩瞬間，寫下最真摯的註解。期待下一次，我們再次一同探索美麗的世界。」
+                </p>
+                <div class="flex justify-center items-center gap-6 mt-16">
+                    <p class="font-cormorant font-black text-2xl text-[#8B2635]">—— Your Private Escort, Carl 敬上</p>
+                    <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Carl's Logo" class="h-20 w-auto object-contain mix-blend-multiply" />
+                </div>
+            </section>
+        </div>
+
+        <!-- Main Itinerary (Generated by JS below) -->
+        <main id="itinerary-container" class="max-w-7xl mx-auto px-6 mt-20"></main>
+
+        <!-- Footer -->
+        <footer class="bg-[#153F2D] text-[#F9F7F1] py-32 text-center mt-32 print:bg-white print:text-black print:border-t-4">
+            <i data-lucide="heart" class="mx-auto mb-10 text-[#D4AF37] w-12 h-12"></i>
+            <h2 class="text-4xl font-serif font-black uppercase mb-6 tracking-[0.4em]">世界很美，感謝有您</h2>
+            <p class="font-cormorant italic text-3xl mb-16 text-[#D4AF37]">"Enjoy the World with Carl"</p>
+            <div class="flex justify-center items-center gap-10">
+                <div class="w-32 h-[1px] bg-white/20 print:bg-black/20"></div>
+                <p class="text-[12px] font-sans font-black tracking-[0.5em] uppercase opacity-70">Carl Chan • 專屬回憶冊</p>
+                <div class="w-32 h-[1px] bg-white/20 print:bg-black/20"></div>
+            </div>
+        </footer>
 
     </div>
 
-    <!-- Firebase SDKs & 邏輯 -->
+    <!-- Firebase SDKs -->
     <script type="module">
-        // 改用 ES 模組方式載入 3D 翻頁套件，確保無錯誤
-        import { PageFlip } from "https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.module.js";
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
         const firebaseConfig = {
               apiKey: "AIzaSyCJ7Zln_xHCR02DQz8LbNRUqTcNVJm5fSo",
               authDomain: "viva-1st.firebaseapp.com",
@@ -151,7 +256,7 @@
         };
         const appId = "premium-rhine-viva-master-v1";
 
-        // --- 1. 構建書本 HTML 結構 ---
+        // --- 1. Render the Static Itinerary HTML ---
         const initialItinerary = [
             { day: 1, date: "2026年5月11日", location: "香港 至 法蘭克福", title: "啟程・雲端上的期盼", description: "齊集香港國際機場，搭乘國泰航空航班前往法蘭克福，與您的專屬旅伴一同迎接這趟充滿極致美食與絕美風光的萊茵河船之旅。", color: "#8B2635", headingPhoto: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1200&auto=format&fit=crop" },
             { day: 2, date: "2026年5月12日", location: "德國，科隆 (Köln)", title: "降臨・哥德尖塔與永恆香氣", description: "航班抵達法蘭克福，隨即前往科隆展開旅程。仰望宏偉的哥德式建築傑作——科隆大教堂。隨後造訪歷史悠久的 4711 古龍水創始店，探索經典香氣的發源地，感受古老城市的魅力。", color: "#1E4D2B", headingPhoto: "https://i.postimg.cc/qRzmc7wV/Whats-App-Image-2026-05-09-at-21-48-34.jpg" },
@@ -166,201 +271,77 @@
             { day: 11, date: "2026年5月21日", location: "抵達 香港", title: "圓滿・安抵家門與重溫美好", description: "航機平穩降落於香港國際機場，這趟橫跨三國的萊茵河極致奢華之旅正式畫下完美的句點。帶著回憶冊中的點滴回憶，期待在下一次的非凡旅程中與您再次相會。", color: "#3E2723", headingPhoto: "https://i.postimg.cc/PxWCRW2K/Whats-App-Image-2026-05-09-at-21-44-38.jpg" }
         ];
 
-        const container = document.getElementById('booklet-root');
-        
-        // 生成封面
-        let htmlContent = `
-            <div class="page" data-density="hard">
-                <div class="page-content flex flex-col justify-center items-center px-10 border-r border-gray-300">
-                    <header class="w-full text-center border-b-[6px] border-double border-[#1a1a1a] pb-8 mb-8">
-                        <p class="font-cormorant italic text-xl text-gray-500 mb-4 tracking-widest">Escorted by Carl Chan</p>
-                        <h1 class="text-[5.5rem] font-cinzel font-bold uppercase tracking-tighter mb-2 leading-none text-[#5D4037]">Premium</h1>
-                        <h1 class="text-4xl font-cinzel font-semibold uppercase tracking-[0.4em] mb-6 text-[#5D4037]">Holidays</h1>
-                        <h2 class="text-2xl font-serif font-black tracking-[0.3em] mb-8 text-[#8B2635]">萊茵河之旅 • 時光紀實</h2>
-                        <div class="flex flex-wrap justify-center items-center border-t-2 border-b-2 border-[#1a1a1a] py-4 gap-4">
-                            <span class="font-sans font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-2">
-                                <i data-lucide="newspaper" class="w-[16px] h-[16px] text-[#8B2635]"></i> Viva Cruises
-                            </span>
-                            <span class="font-serif italic text-xl font-black mx-2">@康爺帶您嘆世界</span>
-                            <span class="font-sans font-black text-[10px] uppercase tracking-[0.3em]">11 Days / 德 • 法 • 瑞</span>
-                        </div>
-                    </header>
-                    <div class="text-center mt-6 no-print">
-                        <span class="animate-pulse flex flex-col items-center gap-2 text-gray-400 font-sans text-xs tracking-widest">
-                            <span>點擊邊緣或拖曳翻頁</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="page">
-                <div class="page-content flex flex-col justify-center px-10 border-l border-gray-300 text-center">
-                    <section class="w-full">
-                        <p class="font-serif text-xl leading-[2.6] text-gray-800 italic tracking-wide">
-                            「致我最尊貴的貴賓們：<br/><br/>
-                            旅程的長度可以用天數計算，但我們共同創造的回憶，卻是超越時間的無價之寶。這本紀念冊，是我為您準備的心意。這裡記錄了萊茵河畔的微風，與我們舉杯共飲的歡笑。<br/><br/>
-                            請在此上傳您的視角，讓我為您的每一個精彩瞬間，寫下最真摯的註解。期待下一次，我們再次一同探索美麗的世界。」
-                        </p>
-                        <div class="flex justify-center items-center gap-6 mt-16">
-                            <p class="font-cormorant font-black text-2xl text-[#8B2635]">—— Your Private Escort, Carl 敬上</p>
-                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Carl's Logo" class="h-16 w-auto object-contain mix-blend-multiply" />
-                        </div>
-                    </section>
-                </div>
-            </div>
-        `;
+        const container = document.getElementById('itinerary-container');
+        let htmlContent = '';
 
-        // 生成每一天 (嚴格套用 Flex & Grid 確保填滿一頁 A4 比例，不會溢出)
-        initialItinerary.forEach((item, index) => {
+        initialItinerary.forEach(item => {
             const dayNum = item.day < 10 ? `0${item.day}` : item.day;
             const isNoMoments = (item.day === 1 || item.day === 11);
-            const borderClass = (index % 2 === 0) ? 'border-r' : 'border-l'; 
+            const articleClass = isNoMoments ? "no-moments" : "has-moments";
             
-            if (isNoMoments) {
-                // 首日與最終日：放大文字與封面圖以優雅填滿版面
-                htmlContent += `
-                <div class="page">
-                    <div class="page-content px-10 py-10 ${borderClass} border-gray-300 flex flex-col justify-center relative">
-                        <div class="absolute top-8 right-8 z-10 opacity-60 pointer-events-none no-print">
-                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Logo" class="h-16 w-auto" />
-                        </div>
-                        
-                        <div class="flex flex-col items-center text-center gap-6">
-                            <h2 class="text-[6rem] font-cinzel font-bold tracking-tighter leading-none" style="color: ${item.color}">${dayNum}.</h2>
-                            <div class="pb-2">
-                                <span class="block text-xl font-cormorant italic text-gray-400 mb-2">${item.date}</span>
-                                <h3 class="text-4xl font-serif font-black tracking-tight leading-tight">${item.title}</h3>
-                            </div>
-                            
-                            <div class="w-full max-w-[85%] mx-auto relative bg-white p-3 border shadow-md">
-                                 <img src="${item.headingPhoto}" class="w-full h-[320px] object-cover block" alt="Cover" />
-                            </div>
-
-                            <div class="text-[20px] font-cormorant italic text-[#222] mt-6 px-4">
-                                <p class="leading-[2.2] tracking-wide">
-                                    <span class="font-sans font-black not-italic uppercase text-[14px] tracking-[0.3em] block mb-3" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
-                                    ${item.description}
-                                </p>
-                            </div>
-                        </div>
+            const momentsSection = !isNoMoments ? `
+                <div class="mt-20 pt-12 border-t border-dashed border-gray-300">
+                    <h4 class="font-serif text-2xl font-black italic text-[#8B2635] tracking-widest uppercase mb-12">Signature Moments</h4>
+                    <div id="moments-${item.day}" class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                        <label class="upload-label-${item.day} relative moment-col no-print aspect-square bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden">
+                            <input type="file" class="hidden-input live-upload-input" data-day="${item.day}" accept="image/*" multiple />
+                            <i data-lucide="camera" class="w-10 h-10 text-gray-300 mb-4 pointer-events-none"></i>
+                            <span class="text-[11px] font-sans font-black uppercase tracking-[0.3em] text-gray-400 pointer-events-none">添加照片</span>
+                        </label>
                     </div>
                 </div>
-                `;
-            } else {
-                // 一般行程日：嚴謹分配高度 (標題固定 + 內文固定高度 + 簽名照 Grid 自動填滿剩餘高度)
-                htmlContent += `
-                <div class="page">
-                    <div class="page-content px-8 py-10 ${borderClass} border-gray-300 flex flex-col relative h-full">
-                        <div class="absolute top-8 right-8 z-10 opacity-60 pointer-events-none no-print">
-                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Logo" class="h-14 w-auto" />
+            ` : '';
+
+            htmlContent += `
+            <article class="mb-40 pt-12 border-t-2 border-[#1a1a1a] relative ${articleClass}">
+                <div class="absolute top-6 right-0 z-10 opacity-60 pointer-events-none no-print">
+                    <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Logo" class="h-24 w-auto" />
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    <div class="lg:col-span-3">
+                        <h2 class="text-8xl md:text-[7rem] font-cinzel font-bold tracking-tighter" style="color: ${item.color}">${dayNum}.</h2>
+                    </div>
+                    <div class="lg:col-span-9">
+                        <div class="mb-10">
+                            <span class="block text-xl font-cormorant italic text-gray-400 mb-3">${item.date}</span>
+                            <h3 class="text-5xl font-serif font-black tracking-tight leading-tight">${item.title}</h3>
                         </div>
-                        
-                        <!-- 頂部標題區 (固定高度) -->
-                        <div class="flex items-end gap-5 mb-4 flex-none">
-                            <h2 class="text-[4.5rem] font-cinzel font-bold tracking-tighter leading-none" style="color: ${item.color}">${dayNum}.</h2>
-                            <div class="pb-1">
-                                <span class="block text-lg font-cormorant italic text-gray-400 mb-1">${item.date}</span>
-                                <h3 class="text-[1.7rem] font-serif font-black tracking-tight leading-tight">${item.title}</h3>
-                            </div>
-                        </div>
-                        
-                        <!-- 內文與代表圖片區 (強制固定高度，完美切齊) -->
-                        <div class="flex gap-5 mb-4 items-stretch flex-none h-[180px]">
-                            <div class="flex-1 text-[17.5px] font-cormorant italic text-[#222] text-justify flex flex-col justify-center">
-                                <p class="leading-[1.7] tracking-wide my-auto">
-                                    <span class="font-sans font-black not-italic uppercase text-[12px] tracking-[0.3em] block mb-2" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
+                        <div class="flex flex-col md:flex-row gap-12 mb-12 items-stretch content-row">
+                            <div class="flex-1 text-[24px] font-cormorant italic text-[#222] text-justify flex flex-col justify-center content-text">
+                                <p class="leading-[2.2] tracking-wide my-auto">
+                                    <span class="font-sans font-black not-italic uppercase text-[16px] tracking-[0.3em] block mb-3" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
                                     ${item.description}
                                 </p>
                             </div>
-                            <div class="w-[42%] shrink-0 relative flex flex-col">
-                                <div class="bg-white p-2 border shadow-sm relative flex-1 min-h-0">
-                                    <img src="${item.headingPhoto}" class="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover block" alt="Cover" />
+                            <div class="w-full md:w-[42%] shrink-0 relative photo-wrapper">
+                                <div class="photo-container bg-white p-2 border shadow-lg relative flex flex-col h-full">
+                                    <img src="${item.headingPhoto}" class="w-full h-full object-cover block" alt="Cover" />
                                 </div>
-                                <div class="w-full text-right mt-1.5 flex-none">
-                                    <span class="font-sans text-[9px] font-black tracking-[0.3em] px-2 py-1 bg-[#1a1a1a] text-[#D4AF37] uppercase inline-flex items-center gap-2">
+                                <div class="w-full text-right mt-2">
+                                    <span class="font-sans text-[10px] font-black tracking-[0.3em] px-3 py-1 bg-[#1a1a1a] text-[#D4AF37] uppercase inline-flex items-center gap-2">
                                         <i data-lucide="map-pin" class="w-3 h-3"></i> ${item.location}
                                     </span>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- 專屬回憶上傳區 (利用 flex-1 填滿 A4 剩餘所有空間) -->
-                        <div class="flex-1 border-t border-dashed border-gray-300 flex flex-col pt-4 min-h-0">
-                            <h4 class="font-serif text-[1.2rem] font-black italic text-[#8B2635] tracking-widest uppercase mb-3 flex-none">Signature Moments</h4>
-                            
-                            <!-- 嚴格的 2x2 網格，確保四張照片長滿剩下版面不溢出 -->
-                            <div id="moments-${item.day}" class="grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-3 flex-1 min-h-0 pb-2">
-                                <label class="upload-label-${item.day} relative moment-col no-print w-full h-full bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden min-h-0">
-                                    <input type="file" class="hidden-input live-upload-input" data-day="${item.day}" accept="image/*" multiple />
-                                    <i data-lucide="camera" class="w-8 h-8 text-gray-300 mb-3 pointer-events-none"></i>
-                                    <span class="text-[11px] font-sans font-black uppercase tracking-[0.3em] text-gray-400 pointer-events-none">添加照片</span>
-                                </label>
-                            </div>
-                        </div>
+                        ${momentsSection}
                     </div>
                 </div>
-                `;
-            }
+            </article>
+            `;
         });
         
-        // 封底
-        htmlContent += `
-            <div class="page" data-density="hard">
-                <div class="page-content footer-page bg-[#153F2D] text-[#F9F7F1] flex flex-col justify-center items-center p-10 border-l border-[#0c261b]">
-                    <i data-lucide="heart" class="mb-10 text-[#D4AF37] w-12 h-12"></i>
-                    <h2 class="text-3xl font-serif font-black uppercase mb-6 tracking-[0.4em] text-center">世界很美，感謝有您</h2>
-                    <p class="font-cormorant italic text-3xl mb-16 text-[#D4AF37] text-center">"Enjoy the World with Carl"</p>
-                    <div class="flex justify-center items-center gap-8 w-full px-6">
-                        <div class="flex-1 h-[1px] bg-white/20"></div>
-                        <p class="text-[11px] font-sans font-black tracking-[0.5em] uppercase opacity-70">Carl Chan • 專屬回憶冊</p>
-                        <div class="flex-1 h-[1px] bg-white/20"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-
         container.innerHTML = htmlContent;
-        lucide.createIcons();
+        lucide.createIcons(); // Initialize Lucide Icons
 
-        // --- 初始化 StPageFlip 翻頁引擎 ---
-        let pageFlip;
-        function initPageFlip() {
-            // 設定基準尺寸 (嚴格對應 A4 比例：210mm x 297mm 的縮放值)
-            pageFlip = new PageFlip(document.getElementById('booklet-root'), {
-                width: 794, 
-                height: 1123, 
-                size: "stretch", // 已將 "fit" 變更為 "stretch"，以解決 Invalid size type 錯誤
-                minWidth: 315,
-                maxWidth: 1000,
-                minHeight: 420,
-                maxHeight: 1414,
-                maxShadowOpacity: 0.2,
-                showCover: true,
-                mobileScrollSupport: true,
-                usePortrait: true 
-            });
-            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-
-            // 綁定導航按鈕
-            document.getElementById('btn-prev').addEventListener('click', () => pageFlip.flipPrev());
-            document.getElementById('btn-next').addEventListener('click', () => pageFlip.flipNext());
-            
-            pageFlip.on('flip', (e) => {
-                document.getElementById('btn-prev').style.opacity = e.data === 0 ? '0.5' : '1';
-                document.getElementById('btn-next').style.opacity = e.data === pageFlip.getPageCount() - 1 ? '0.5' : '1';
-            });
-        }
-        
-        setTimeout(initPageFlip, 500);
-
-        // --- Firebase 與 同步邏輯 ---
-        let appInstance, authInstance, dbInstance;
-        let userInstance = null;
+        // --- 2. Initialize Firebase & Cloud Sync Logic ---
+        let app, auth, db;
+        let user = null;
         let remoteData = {};
 
         const statusEl = document.createElement('div');
         statusEl.className = 'no-print';
+        // 將預設的 opacity 改為 0，並取消點擊事件，讓它一開始就隱形
         statusEl.style.cssText = 'position:fixed;top:15px;left:15px;z-index:9999;background:white;padding:10px 20px;border-radius:30px;font-size:12px;font-family:sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;font-weight:bold;transition:all 0.5s ease-in-out; opacity:0; pointer-events:none;';
         statusEl.innerHTML = '<div id="status-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;"></div><span id="status-text">初始化雲端...</span>';
         document.body.appendChild(statusEl);
@@ -368,39 +349,84 @@
         function setSyncStatus(status) {
             const dot = document.getElementById('status-dot');
             const txt = document.getElementById('status-text');
+            
+            // 只有在發生錯誤 (error) 或本地模式 (local) 時才顯示氣泡
             if (status.startsWith('error') || status === 'local') {
-                statusEl.style.opacity = '1'; statusEl.style.pointerEvents = 'auto';
+                statusEl.style.opacity = '1';
+                statusEl.style.pointerEvents = 'auto';
             } else {
-                statusEl.style.opacity = '0'; statusEl.style.pointerEvents = 'none';
+                statusEl.style.opacity = '0';
+                statusEl.style.pointerEvents = 'none';
             }
+
             if (status === 'syncing') { dot.style.background = '#3b82f6'; txt.innerText = '同步中...'; }
             else if (status === 'saved') { dot.style.background = '#10b981'; txt.innerText = '已儲存到雲端'; setTimeout(()=>setSyncStatus('idle'), 3000); }
             else if (status === 'idle') { dot.style.background = '#10b981'; txt.innerText = '雲端已連線'; }
-            else if (status === 'error_auth_disabled') { dot.style.background = '#ef4444'; txt.innerText = '錯誤：請啟用匿名登入'; }
-            else if (status === 'error_firestore_disabled') { dot.style.background = '#ef4444'; txt.innerText = '錯誤：Firestore 未建立或權限遭拒'; }
-            else if (status === 'error') { dot.style.background = '#ef4444'; txt.innerText = '同步失敗'; }
-            else if (status === 'local') { dot.style.background = '#f59e0b'; txt.innerText = '本地模式'; }
+            else if (status === 'error_auth_disabled') { 
+                dot.style.background = '#ef4444'; 
+                txt.innerText = '錯誤：請在 Firebase 後台啟用「匿名登入 (Anonymous)」'; 
+            }
+            else if (status === 'error_firestore_disabled') { 
+                dot.style.background = '#ef4444'; 
+                txt.innerText = '錯誤：Firestore 未建立或權限遭拒'; 
+            }
+            else if (status === 'error') { dot.style.background = '#ef4444'; txt.innerText = '同步失敗 - 請確認網路與設定'; }
+            else if (status === 'local') { dot.style.background = '#f59e0b'; txt.innerText = '本地模式 (Firebase 未配置)'; }
         }
 
+        // 建立明顯的錯誤提示橫幅 (通用版)
+        function showErrorBanner(title, message) {
+            if (document.getElementById('firebase-error-banner')) return; // 避免重複彈出
+            const errorBanner = document.createElement('div');
+            errorBanner.id = 'firebase-error-banner';
+            errorBanner.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ef4444;color:white;padding:15px 20px;text-align:center;z-index:10000;font-weight:bold;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+            errorBanner.innerHTML = `<span>⚠️ <b>${title}：</b>${message}</span><button onclick="this.parentElement.remove()" style="background:rgba(0,0,0,0.2);border:none;color:white;padding:5px 10px;border-radius:5px;cursor:pointer;white-space:nowrap;">關閉</button>`;
+            document.body.appendChild(errorBanner);
+        }
+
+        // Try to initialize Firebase
         try {
-            appInstance = initializeApp(firebaseConfig);
-            authInstance = getAuth(appInstance);
-            dbInstance = getFirestore(appInstance);
-            onAuthStateChanged(authInstance, async (u) => {
-                if (!u) {
-                    try { await signInAnonymously(authInstance); } 
-                    catch(e) { setSyncStatus('error'); }
-                } else {
-                    userInstance = u;
-                    setSyncStatus('idle');
-                    initSync();
+            if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                console.warn("Firebase is not configured. Running in local/offline mode. Photos will not be saved.");
+                setSyncStatus('local');
+            } else {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                if (window.location.protocol === 'file:') {
+                    document.getElementById('status-text').innerHTML = '⚠️ 請將檔案上傳至網頁空間（如 GitHub Pages）以啟用上傳功能';
+                    document.getElementById('status-dot').style.background = '#ef4444';
                 }
-            });
-        } catch(e) { setSyncStatus('local'); }
+
+                onAuthStateChanged(auth, async (u) => {
+                    if (!u) {
+                        try { 
+                            await signInAnonymously(auth); 
+                        } catch(e) { 
+                            console.error("Firebase Login Error:", e); 
+                            if (e.code === 'auth/admin-restricted-operation' || e.code === 'auth/operation-not-allowed') {
+                                setSyncStatus('error_auth_disabled');
+                                showErrorBanner('Firebase 登入設定錯誤', '您的專案尚未啟用「匿名登入」。請前往 Firebase Console -> Authentication -> Sign-in method 啟用「Anonymous」。');
+                            } else {
+                                setSyncStatus('error'); 
+                            }
+                        }
+                    } else {
+                        user = u;
+                        setSyncStatus('idle');
+                        initSync();
+                    }
+                });
+            }
+        } catch(e) {
+            console.error("Firebase setup failed:", e);
+            setSyncStatus('local');
+        }
 
         function initSync() {
-            if (!dbInstance) return;
-            const daysCollection = collection(dbInstance, 'artifacts', appId, 'public', 'data', 'days');
+            if (!db) return;
+            const daysCollection = collection(db, 'artifacts', appId, 'public', 'data', 'days');
             onSnapshot(daysCollection, (snapshot) => {
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
@@ -408,10 +434,21 @@
                     remoteData[dayStr] = data;
                     updateDOM(dayStr, data);
                 });
-            }, (err) => { setSyncStatus('error'); });
+            }, (err) => {
+                console.error("Firestore Sync Error:", err);
+                if (err.code === 'permission-denied') {
+                    setSyncStatus('error_firestore_disabled');
+                    if (err.message.includes('has not been used')) {
+                        showErrorBanner('Firestore 資料庫尚未建立', '請前往 Firebase Console -> Build -> Firestore Database，點擊「Create database (建立資料庫)」來啟用您的資料庫。');
+                    } else {
+                        showErrorBanner('Firestore 權限遭拒', '請前往 Firebase Console -> Firestore Database -> Rules，將規則設定為允許讀寫 (allow read, write: if true;)。');
+                    }
+                } else {
+                    setSyncStatus('error');
+                }
+            });
         }
 
-        // 動態生成或更新回憶照片 (嚴格遵循 Grid 單元格與 h-full 限制)
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
             if (!container) return;
@@ -424,16 +461,16 @@
 
             photos.forEach((base64, i) => {
                 const div = document.createElement('div');
-                div.className = 'moment-item moment-col flex flex-col h-full min-h-0 w-full';
+                div.className = 'moment-item moment-col flex flex-col gap-4';
                 div.innerHTML = `
-                    <div class="photo-container bg-white p-1 border shadow-sm relative group flex-1 min-h-0 w-full">
-                        <img src="${base64}" class="absolute inset-1.5 w-[calc(100%-12px)] h-[calc(100%-12px)] object-cover block" />
+                    <div class="photo-container bg-white p-2.5 border shadow-md relative group">
+                        <img src="${base64}" class="w-full aspect-square object-cover" />
                         <button class="remove-photo-btn no-print print:hidden" data-day="${day}" data-idx="${i}">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
-                    <div class="pl-2 border-l-[2px] border-[#8B2635]/30 flex-none h-[28px] mt-1.5 w-full">
-                        <textarea class="live-caption-box w-full h-full bg-transparent border-none p-0 text-[12px] md:text-[13px] italic leading-tight text-gray-800 font-serif outline-none resize-none" data-day="${day}" data-idx="${i}" placeholder="在此填寫回憶...">${caps[i] || ""}</textarea>
+                    <div class="pl-4 border-l-2 border-gray-200">
+                        <textarea class="live-caption-box w-full bg-transparent border-none p-0 text-[13px] italic leading-relaxed text-gray-800 font-serif outline-none resize-none" rows="2" data-day="${day}" data-idx="${i}" placeholder="在此填寫回憶註解...">${caps[i] || ""}</textarea>
                     </div>
                 `;
                 const label = container.querySelector('.upload-label-' + day);
@@ -455,8 +492,12 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
-                        canvas.width = width; canvas.height = height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         resolve(canvas.toDataURL('image/jpeg', 0.5)); 
@@ -465,39 +506,43 @@
             });
         }
 
-        // 避免拖曳翻頁時觸發上傳框的點擊
-        document.addEventListener('pointerdown', (e) => {
-            if (e.target.closest('.live-caption-box') || e.target.closest('.live-upload-input') || e.target.closest('.remove-photo-btn')) {
-                e.stopPropagation();
-            }
-        });
-
+        // Handle File Uploads
         document.addEventListener('change', async (e) => {
             if (e.target.classList.contains('live-upload-input')) {
                 const day = e.target.dataset.day;
                 const files = Array.from(e.target.files);
-                if (!files.length || !userInstance || !dbInstance) return;
+                if (!files.length) return;
+
+                if (!user || !db) {
+                    alert("Firebase 未連線，照片將無法上傳儲存。請確認已啟用匿名登入。");
+                    return;
+                }
                 
                 setSyncStatus('syncing');
                 const dayData = remoteData[day] || {};
-                const newPhotos = [...(dayData.userPhotos || [])];
+                const existingPhotos = dayData.userPhotos || [];
+                const newPhotos = [...existingPhotos];
 
                 for (const file of files) {
                     if (newPhotos.length >= 4) break;
-                    newPhotos.push(await compressImage(file));
+                    const base64 = await compressImage(file);
+                    newPhotos.push(base64);
                 }
 
                 try {
-                    await setDoc(doc(dbInstance, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day), { userPhotos: newPhotos }, { merge: true });
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day);
+                    await setDoc(docRef, { userPhotos: newPhotos }, { merge: true });
                     setSyncStatus('saved');
-                } catch(err) { setSyncStatus('error'); }
+                } catch(err) { setSyncStatus('error'); console.error(err); }
+                
                 e.target.value = '';
             }
         });
 
+        // Handle Photo Deletion
         document.addEventListener('click', async (e) => {
             const removeBtn = e.target.closest('.remove-photo-btn');
-            if (removeBtn && userInstance && dbInstance) {
+            if (removeBtn && user && db) {
                 setSyncStatus('syncing');
                 const day = removeBtn.dataset.day;
                 const idx = parseInt(removeBtn.dataset.idx);
@@ -513,45 +558,89 @@
                 });
 
                 try {
-                    await setDoc(doc(dbInstance, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day), { userPhotos: newPhotos, captions: updatedCaptions }, { merge: true });
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day);
+                    await setDoc(docRef, { userPhotos: newPhotos, captions: updatedCaptions }, { merge: true });
                     setSyncStatus('saved');
                 } catch(err) { setSyncStatus('error'); }
             }
         });
 
+        // Handle Captions Save
         document.addEventListener('blur', async (e) => {
-            if (e.target.classList.contains('live-caption-box') && userInstance && dbInstance) {
+            if (e.target.classList.contains('live-caption-box') && user && db) {
                 setSyncStatus('syncing');
                 const day = e.target.dataset.day;
                 const idx = parseInt(e.target.dataset.idx);
-                const currentCaptions = { ...((remoteData[day] || {}).captions || {}), [idx]: e.target.value };
+                const val = e.target.value;
+                const dayData = remoteData[day] || {};
+                const currentCaptions = { ...(dayData.captions || {}), [idx]: val };
                 
                 try {
-                    await setDoc(doc(dbInstance, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day), { captions: currentCaptions }, { merge: true });
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day);
+                    await setDoc(docRef, { captions: currentCaptions }, { merge: true });
                     setSyncStatus('saved');
                 } catch(err) { setSyncStatus('error'); }
             }
         }, true);
 
-        // --- 列印控制 ---
-        const hideElementsForPrint = () => document.body.classList.add('is-printing');
-        const restoreElementsAfterPrint = () => document.body.classList.remove('is-printing');
+        // --- 第三重防護：100% 確保列印 PDF 時隱藏按鈕 (JavaScript 終極強制隱藏法) ---
+        const hideElementsForPrint = () => {
+            document.body.classList.add('is-printing');
+        };
 
+        const restoreElementsAfterPrint = () => {
+            document.body.classList.remove('is-printing');
+        };
+
+        // 攔截瀏覽器原生的列印動作
         window.addEventListener('beforeprint', hideElementsForPrint);
         window.addEventListener('afterprint', restoreElementsAfterPrint);
 
+        // 針對 Safari/iOS 等有時會忽略 beforeprint 的設備，加入 matchMedia 防護
         if (window.matchMedia) {
-            window.matchMedia('print').addListener(mql => mql.matches ? hideElementsForPrint() : restoreElementsAfterPrint());
+            const mediaQueryList = window.matchMedia('print');
+            mediaQueryList.addListener(mql => {
+                if (mql.matches) hideElementsForPrint();
+                else restoreElementsAfterPrint();
+            });
         }
         
+        // --- 針對手機版瀏覽器 (Mobile Chrome/Safari) 新增的獨立「列印」按鈕事件 ---
+        // 解決手機瀏覽器分享為 PDF 時抓不到 JS 列印狀態的問題
         document.getElementById('mobile-print-btn')?.addEventListener('click', () => {
             hideElementsForPrint();
             setTimeout(() => {
                 window.print();
-                setTimeout(() => restoreElementsAfterPrint(), 2000);
+                setTimeout(() => {
+                    restoreElementsAfterPrint();
+                }, 2000);
             }, 100);
         });
 
     </script>
+
+    <!-- 第四重防護：放置於最底部的強制樣式表 (確保不被 Tailwind 等框架覆蓋) -->
+    <style type="text/css">
+        @media print {
+            html body .remove-photo-btn,
+            html body div.photo-container button {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                width: 0 !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                pointer-events: none !important;
+            }
+            html body .live-caption-box::-webkit-input-placeholder,
+            html body .live-caption-box::-moz-placeholder,
+            html body .live-caption-box::placeholder {
+                color: transparent !important;
+            }
+        }
+    </style>
 </body>
 </html>
+
