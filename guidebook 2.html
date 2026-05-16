@@ -458,6 +458,33 @@
             }
         }, true);
 
+        // --- 100% 確保列印 PDF 時隱藏按鈕 (JavaScript 終極強制隱藏法) ---
+        // 由於部分瀏覽器可能會忽略 CSS，我們透過 JS 在準備「列印/匯出 PDF」瞬間強制抹除按鈕
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('.remove-photo-btn').forEach(btn => {
+                btn.style.setProperty('display', 'none', 'important');
+                btn.style.setProperty('opacity', '0', 'important');
+            });
+            // 同時隱藏輸入框的浮水印文字
+            document.querySelectorAll('.live-caption-box').forEach(ta => {
+                ta.dataset.placeholder = ta.placeholder;
+                ta.placeholder = '';
+            });
+        });
+
+        // 列印視窗關閉或匯出完成後，恢復畫面原狀
+        window.addEventListener('afterprint', () => {
+            document.querySelectorAll('.remove-photo-btn').forEach(btn => {
+                btn.style.removeProperty('display');
+                btn.style.removeProperty('opacity');
+            });
+            document.querySelectorAll('.live-caption-box').forEach(ta => {
+                if (ta.dataset.placeholder) {
+                    ta.placeholder = ta.dataset.placeholder;
+                }
+            });
+        });
+
     </script>
 </body>
 </html>
