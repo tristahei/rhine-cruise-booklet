@@ -61,6 +61,14 @@
 </head>
 <body class="bg-[#F9F7F1] min-h-screen font-serif pb-20 relative selection:bg-black selection:text-white print:bg-[#F9F7F1]">
 
+    <!-- 浮動列印按鈕 (解決手機版 PDF 隱藏失效的問題) -->
+    <div class="no-print fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[100] flex flex-col items-end gap-4">
+        <button id="mobile-print-btn" class="flex items-center gap-3 px-5 py-3 md:px-6 md:py-4 rounded-full shadow-2xl transition-all bg-[#8B2635] hover:scale-105 text-white focus:outline-none">
+            <i data-lucide="printer" class="w-5 h-5 text-[#D4AF37]"></i>
+            <span class="font-sans font-black text-[12px] uppercase tracking-[0.2em] hidden sm:block">生成 PDF</span>
+        </button>
+    </div>
+
     <!-- Dynamic Container for the Booklet -->
     <div id="booklet-root" class="max-w-7xl mx-auto relative">
         
@@ -477,6 +485,24 @@
                 else restoreElementsAfterPrint();
             });
         }
+        
+        // --- 針對手機版瀏覽器 (Mobile Chrome/Safari) 新增的獨立「列印」按鈕事件 ---
+        // 解決手機瀏覽器分享為 PDF 時抓不到 JS 列印狀態的問題
+        document.getElementById('mobile-print-btn')?.addEventListener('click', () => {
+            // 先強制改變畫面 (隱藏不需要列印的元素)
+            hideElementsForPrint();
+            
+            // 給瀏覽器一點時間去重新渲染畫面 (100毫秒)
+            setTimeout(() => {
+                // 呼叫系統列印介面
+                window.print();
+                
+                // 等待一段時間後恢復畫面 (給予使用者操作列印介面的緩衝時間)
+                setTimeout(() => {
+                    restoreElementsAfterPrint();
+                }, 2000);
+            }, 100);
+        });
 
     </script>
 
