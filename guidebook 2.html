@@ -141,7 +141,8 @@
             /* 顯著放大您的專屬回憶照片，確保4張剛好填滿剩下的A4空間 */
             .moment-col .photo-container img {
                 width: 100% !important;
-                height: 275px !important; /* 極大化設定 */
+                height: auto !important; /* 讓高度自動適應照片比例，完全貼合不留白 */
+                max-height: 250px !important; /* 限制最大高度，防止極端直圖破壞 A4 排版 */
                 object-fit: cover !important;
             }
             .live-caption-box {
@@ -283,7 +284,7 @@
                 <div class="mt-20 pt-12 border-t border-dashed border-gray-300">
                     <h4 class="font-serif text-2xl font-black italic text-[#8B2635] tracking-widest uppercase mb-12">Signature Moments</h4>
                     <div id="moments-${item.day}" class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                        <label class="upload-label-${item.day} relative moment-col no-print aspect-square bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden">
+                        <label class="upload-label-${item.day} relative moment-col no-print aspect-[4/3] bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden">
                             <input type="file" class="hidden-input live-upload-input" data-day="${item.day}" accept="image/*" multiple />
                             <i data-lucide="camera" class="w-10 h-10 text-gray-300 mb-4 pointer-events-none"></i>
                             <span class="text-[11px] font-sans font-black uppercase tracking-[0.3em] text-gray-400 pointer-events-none">添加照片</span>
@@ -464,7 +465,7 @@
                 div.className = 'moment-item moment-col flex flex-col gap-4';
                 div.innerHTML = `
                     <div class="photo-container bg-white p-2.5 border shadow-md relative group">
-                        <img src="${base64}" class="w-full aspect-square object-cover" />
+                        <img src="${base64}" class="w-full h-auto max-h-[350px] object-cover" />
                         <button class="remove-photo-btn no-print print:hidden" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
@@ -481,7 +482,7 @@
             if (uploadLabel) uploadLabel.style.display = photos.length >= 4 ? 'none' : 'flex';
         }
 
-        async function compressImage(file, maxWidth = 700) {
+        async function compressImage(file, maxWidth = 1200) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -500,7 +501,7 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.5)); 
+                        resolve(canvas.toDataURL('image/jpeg', 0.85)); 
                     };
                 };
             });
@@ -643,4 +644,3 @@
     </style>
 </body>
 </html>
-
