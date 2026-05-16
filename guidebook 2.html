@@ -35,13 +35,14 @@
         .no-print { display: block; }
         
         .remove-photo-btn {
-            position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 8px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: absolute; top: 6px; right: 6px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 6px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         /* 翻頁書本專用樣式 */
         .page {
             background-color: #F9F7F1;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            overflow: hidden; /* 確保內容絕對不會超出單頁邊界 */
         }
         .page-content {
             width: 100%;
@@ -61,7 +62,7 @@
         }
 
         /* ==========================================
-           列印專用終極版面設定 (強制解除 3D 翻頁並還原 A4)
+           列印專用終極版面設定 (強制解除 3D 翻頁並完美還原 A4)
            ========================================== */
         @media print { 
             .no-print { display: none !important; }
@@ -69,7 +70,7 @@
             
             body { background-color: #F9F7F1 !important; }
             
-            /* 強制解除 StPageFlip 的 Inline Styles */
+            /* 強制解除 StPageFlip 的 Inline Styles，讓其變回正常的上下滾動網頁 */
             #flipbook-wrapper { display: block !important; padding: 0 !important; min-height: auto !important; }
             #booklet-root { display: block !important; width: 100% !important; height: auto !important; transform: none !important; }
             .stf__wrapper, .stf__block, .stf__item { 
@@ -82,13 +83,13 @@
             }
             .stf__shadow { display: none !important; }
             
-            /* 讓每一頁還原為標準 A4 高度 */
+            /* 讓每一頁還原為標準 A4 高度並強制分頁 */
             .page {
                 display: block !important;
                 position: relative !important;
                 transform: none !important;
                 width: 100% !important;
-                height: 277mm !important;
+                height: 277mm !important; /* 嚴格 A4 內部高度 */
                 page-break-after: always !important;
                 break-after: always !important;
                 opacity: 1 !important;
@@ -98,54 +99,9 @@
             }
 
             .page-content { padding: 0 !important; }
-
-            /* 封面與首尾頁排版 */
-            .cover-page { justify-content: center !important; }
-            .cover-page header { padding-top: 0 !important; border-bottom-width: 4px !important; margin-bottom: 2rem !important; }
-            .cover-page header h1.text-7xl { font-size: 4.5rem !important; }
-            .cover-page header h1.md\:text-\[9rem\] { font-size: 6.5rem !important; }
-            .cover-page header h2 { font-size: 2rem !important; }
-            .cover-page section p { font-size: 20px !important; line-height: 2.2 !important; }
-            
-            article.no-moments { justify-content: center !important; padding-top: 0 !important; height: 100% !important; display: flex !important; flex-direction: column !important; }
-            article.no-moments .text-8xl { font-size: 6rem !important; }
-            article.no-moments .text-5xl { font-size: 3rem !important; margin-bottom: 2rem !important; }
-            article.no-moments .content-row { height: auto !important; }
-            article.no-moments .content-text p { font-size: 21px !important; line-height: 2.4 !important; font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; font-style: italic !important; }
-            article.no-moments .photo-wrapper { width: 50% !important; }
-            article.no-moments .photo-wrapper img { max-height: 380px !important; height: 380px !important; }
-
-            /* 常規日子排版 */
-            article.has-moments { padding-top: 6mm !important; height: 100% !important; display: flex !important; flex-direction: column !important; }
-            article.has-moments .text-8xl { font-size: 4rem !important; line-height: 1 !important; }
-            article.has-moments .text-5xl { font-size: 2.2rem !important; line-height: 1.2 !important; }
-            article.has-moments .content-row { height: 185px !important; display: flex !important; align-items: stretch !important; margin-bottom: 15px !important; }
-            article.has-moments .content-text { display: flex !important; flex-direction: column !important; justify-content: center !important; }
-            article.has-moments .content-text p { font-size: 17.5px !important; line-height: 1.8 !important; margin: auto 0 !important; font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; font-style: italic !important; }
-            article.has-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
-            article.no-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
-            article.has-moments .photo-wrapper { height: 100% !important; }
-            article.has-moments .photo-wrapper img { height: 100% !important; max-height: 185px !important; object-fit: cover !important; }
-
-            /* 網格與照片 */
-            div[id^="moments-"] { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px 18px !important; width: 100% !important; margin-top: 5px !important; }
-            .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; width: 100% !important; }
-            .moment-col .photo-container { padding: 4px !important; width: 100% !important; }
-            .moment-col .photo-container img { width: 100% !important; height: 275px !important; object-fit: cover !important; }
-            .live-caption-box { font-family: 'LXGW WenKai TC', cursive, serif !important; font-size: 15px !important; line-height: 1.6 !important; height: 35px !important; overflow: hidden !important; margin-top: 4px !important; }
-            
-            /* 間距優化 */
-            .mb-40 { margin-bottom: 0 !important; }
-            .mt-20 { margin-top: 0 !important; }
-            .pt-12 { padding-top: 5px !important; border-top-width: 1px !important; }
-            h4.mb-12 { margin-bottom: 8px !important; font-size: 1.25rem !important; }
-            .gap-12 { gap: 1.5rem !important; }
-            .mb-10 { margin-bottom: 0.8rem !important; }
-            .flex-col.md\:flex-row { flex-direction: row !important; align-items: flex-start !important; }
-            .md\:w-\[42\%\] { width: 40% !important; }
-            .flex-1 { flex: 1 !important; padding-right: 1rem !important; }
         }
 
+        /* 針對列印/匯出瞬間隱藏按鈕防護 */
         body.is-printing .remove-photo-btn, body.is-printing .no-print { display: none !important; opacity: 0 !important; visibility: hidden !important; width: 0 !important; height: 0 !important; }
         body.is-printing .live-caption-box::placeholder { color: transparent !important; }
     </style>
@@ -178,6 +134,7 @@
 
     <!-- Firebase SDKs & 邏輯 -->
     <script type="module">
+        // 改用 ES 模組方式載入 3D 翻頁套件，確保無錯誤
         import { PageFlip } from "https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.module.js";
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -214,21 +171,21 @@
         // 生成封面
         let htmlContent = `
             <div class="page" data-density="hard">
-                <div class="page-content cover-page justify-center px-8 md:px-16 border-r border-gray-300">
-                    <header class="pt-8 pb-12 text-center border-b-[6px] border-double border-[#1a1a1a] mb-12">
+                <div class="page-content flex flex-col justify-center items-center px-10 border-r border-gray-300">
+                    <header class="w-full text-center border-b-[6px] border-double border-[#1a1a1a] pb-8 mb-8">
                         <p class="font-cormorant italic text-xl text-gray-500 mb-4 tracking-widest">Escorted by Carl Chan</p>
-                        <h1 class="text-6xl md:text-[7rem] lg:text-[8rem] font-cinzel font-bold uppercase tracking-tighter mb-2 leading-none text-[#5D4037]">Premium</h1>
-                        <h1 class="text-3xl md:text-5xl font-cinzel font-semibold uppercase tracking-[0.4em] mb-8 text-[#5D4037]">Holidays</h1>
-                        <h2 class="text-2xl md:text-4xl font-serif font-black tracking-[0.3em] mb-10 text-[#8B2635]">萊茵河之旅 • 時光紀實</h2>
-                        <div class="flex flex-wrap justify-center items-center border-t-2 border-b-2 border-[#1a1a1a] py-4 mt-6 gap-4">
+                        <h1 class="text-[5.5rem] font-cinzel font-bold uppercase tracking-tighter mb-2 leading-none text-[#5D4037]">Premium</h1>
+                        <h1 class="text-4xl font-cinzel font-semibold uppercase tracking-[0.4em] mb-6 text-[#5D4037]">Holidays</h1>
+                        <h2 class="text-2xl font-serif font-black tracking-[0.3em] mb-8 text-[#8B2635]">萊茵河之旅 • 時光紀實</h2>
+                        <div class="flex flex-wrap justify-center items-center border-t-2 border-b-2 border-[#1a1a1a] py-4 gap-4">
                             <span class="font-sans font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-2">
                                 <i data-lucide="newspaper" class="w-[16px] h-[16px] text-[#8B2635]"></i> Viva Cruises
                             </span>
-                            <span class="font-serif italic text-xl md:text-2xl font-black mx-2">@康爺帶您嘆世界</span>
+                            <span class="font-serif italic text-xl font-black mx-2">@康爺帶您嘆世界</span>
                             <span class="font-sans font-black text-[10px] uppercase tracking-[0.3em]">11 Days / 德 • 法 • 瑞</span>
                         </div>
                     </header>
-                    <div class="text-center mt-auto pb-10 no-print">
+                    <div class="text-center mt-6 no-print">
                         <span class="animate-pulse flex flex-col items-center gap-2 text-gray-400 font-sans text-xs tracking-widest">
                             <span>點擊邊緣或拖曳翻頁</span>
                             <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -236,94 +193,127 @@
                     </div>
                 </div>
             </div>
+            
             <div class="page">
-                <div class="page-content intro-page justify-center px-8 md:px-16 border-l border-gray-300">
-                    <section class="text-center">
-                        <p class="font-serif text-xl md:text-2xl leading-[2.6] text-gray-800 italic tracking-wide">
+                <div class="page-content flex flex-col justify-center px-10 border-l border-gray-300 text-center">
+                    <section class="w-full">
+                        <p class="font-serif text-xl leading-[2.6] text-gray-800 italic tracking-wide">
                             「致我最尊貴的貴賓們：<br/><br/>
                             旅程的長度可以用天數計算，但我們共同創造的回憶，卻是超越時間的無價之寶。這本紀念冊，是我為您準備的心意。這裡記錄了萊茵河畔的微風，與我們舉杯共飲的歡笑。<br/><br/>
                             請在此上傳您的視角，讓我為您的每一個精彩瞬間，寫下最真摯的註解。期待下一次，我們再次一同探索美麗的世界。」
                         </p>
                         <div class="flex justify-center items-center gap-6 mt-16">
                             <p class="font-cormorant font-black text-2xl text-[#8B2635]">—— Your Private Escort, Carl 敬上</p>
-                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Carl's Logo" class="h-16 md:h-20 w-auto object-contain mix-blend-multiply" />
+                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Carl's Logo" class="h-16 w-auto object-contain mix-blend-multiply" />
                         </div>
                     </section>
                 </div>
             </div>
         `;
 
-        // 生成每一天
+        // 生成每一天 (嚴格套用 Flex & Grid 確保填滿一頁 A4 比例，不會溢出)
         initialItinerary.forEach((item, index) => {
             const dayNum = item.day < 10 ? `0${item.day}` : item.day;
             const isNoMoments = (item.day === 1 || item.day === 11);
-            const articleClass = isNoMoments ? "no-moments" : "has-moments";
-            const borderClass = (index % 2 === 0) ? 'border-r' : 'border-l'; // 模擬書脊的陰影線
+            const borderClass = (index % 2 === 0) ? 'border-r' : 'border-l'; 
             
-            const momentsSection = !isNoMoments ? `
-                <div class="mt-8 pt-6 border-t border-dashed border-gray-300 flex-1 flex flex-col">
-                    <h4 class="font-serif text-xl md:text-2xl font-black italic text-[#8B2635] tracking-widest uppercase mb-4">Signature Moments</h4>
-                    <div id="moments-${item.day}" class="grid grid-cols-2 gap-4 flex-1">
-                        <label class="upload-label-${item.day} relative moment-col no-print aspect-square bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden h-[200px] md:h-auto">
-                            <input type="file" class="hidden-input live-upload-input" data-day="${item.day}" accept="image/*" multiple />
-                            <i data-lucide="camera" class="w-10 h-10 text-gray-300 mb-4 pointer-events-none"></i>
-                            <span class="text-[11px] font-sans font-black uppercase tracking-[0.3em] text-gray-400 pointer-events-none">添加照片</span>
-                        </label>
+            if (isNoMoments) {
+                // 首日與最終日：放大文字與封面圖以優雅填滿版面
+                htmlContent += `
+                <div class="page">
+                    <div class="page-content px-10 py-10 ${borderClass} border-gray-300 flex flex-col justify-center relative">
+                        <div class="absolute top-8 right-8 z-10 opacity-60 pointer-events-none no-print">
+                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Logo" class="h-16 w-auto" />
+                        </div>
+                        
+                        <div class="flex flex-col items-center text-center gap-6">
+                            <h2 class="text-[6rem] font-cinzel font-bold tracking-tighter leading-none" style="color: ${item.color}">${dayNum}.</h2>
+                            <div class="pb-2">
+                                <span class="block text-xl font-cormorant italic text-gray-400 mb-2">${item.date}</span>
+                                <h3 class="text-4xl font-serif font-black tracking-tight leading-tight">${item.title}</h3>
+                            </div>
+                            
+                            <div class="w-full max-w-[85%] mx-auto relative bg-white p-3 border shadow-md">
+                                 <img src="${item.headingPhoto}" class="w-full h-[320px] object-cover block" alt="Cover" />
+                            </div>
+
+                            <div class="text-[20px] font-cormorant italic text-[#222] mt-6 px-4">
+                                <p class="leading-[2.2] tracking-wide">
+                                    <span class="font-sans font-black not-italic uppercase text-[14px] tracking-[0.3em] block mb-3" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
+                                    ${item.description}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            ` : '';
+                `;
+            } else {
+                // 一般行程日：嚴謹分配高度 (標題固定 + 內文固定高度 + 簽名照 Grid 自動填滿剩餘高度)
+                htmlContent += `
+                <div class="page">
+                    <div class="page-content px-8 py-10 ${borderClass} border-gray-300 flex flex-col relative h-full">
+                        <div class="absolute top-8 right-8 z-10 opacity-60 pointer-events-none no-print">
+                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Logo" class="h-14 w-auto" />
+                        </div>
+                        
+                        <!-- 頂部標題區 (固定高度) -->
+                        <div class="flex items-end gap-5 mb-4 flex-none">
+                            <h2 class="text-[4.5rem] font-cinzel font-bold tracking-tighter leading-none" style="color: ${item.color}">${dayNum}.</h2>
+                            <div class="pb-1">
+                                <span class="block text-lg font-cormorant italic text-gray-400 mb-1">${item.date}</span>
+                                <h3 class="text-[1.7rem] font-serif font-black tracking-tight leading-tight">${item.title}</h3>
+                            </div>
+                        </div>
+                        
+                        <!-- 內文與代表圖片區 (強制固定高度，完美切齊) -->
+                        <div class="flex gap-5 mb-4 items-stretch flex-none h-[180px]">
+                            <div class="flex-1 text-[17.5px] font-cormorant italic text-[#222] text-justify flex flex-col justify-center">
+                                <p class="leading-[1.7] tracking-wide my-auto">
+                                    <span class="font-sans font-black not-italic uppercase text-[12px] tracking-[0.3em] block mb-2" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
+                                    ${item.description}
+                                </p>
+                            </div>
+                            <div class="w-[42%] shrink-0 relative flex flex-col">
+                                <div class="bg-white p-2 border shadow-sm relative flex-1 min-h-0">
+                                    <img src="${item.headingPhoto}" class="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover block" alt="Cover" />
+                                </div>
+                                <div class="w-full text-right mt-1.5 flex-none">
+                                    <span class="font-sans text-[9px] font-black tracking-[0.3em] px-2 py-1 bg-[#1a1a1a] text-[#D4AF37] uppercase inline-flex items-center gap-2">
+                                        <i data-lucide="map-pin" class="w-3 h-3"></i> ${item.location}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
-            htmlContent += `
-            <div class="page">
-                <div class="page-content px-6 md:px-12 py-8 md:py-12 ${borderClass} border-gray-300">
-                    <article class="h-full relative ${articleClass}">
-                        <div class="absolute top-0 right-0 z-10 opacity-60 pointer-events-none no-print">
-                            <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Logo" class="h-16 md:h-20 w-auto" />
-                        </div>
-                        <div class="flex flex-col h-full">
-                            <div class="flex items-end gap-6 mb-6">
-                                <h2 class="text-6xl md:text-[6rem] font-cinzel font-bold tracking-tighter leading-none" style="color: ${item.color}">${dayNum}.</h2>
-                                <div class="pb-2">
-                                    <span class="block text-lg font-cormorant italic text-gray-400 mb-1">${item.date}</span>
-                                    <h3 class="text-3xl md:text-4xl font-serif font-black tracking-tight leading-tight">${item.title}</h3>
-                                </div>
+                        <!-- 專屬回憶上傳區 (利用 flex-1 填滿 A4 剩餘所有空間) -->
+                        <div class="flex-1 border-t border-dashed border-gray-300 flex flex-col pt-4 min-h-0">
+                            <h4 class="font-serif text-[1.2rem] font-black italic text-[#8B2635] tracking-widest uppercase mb-3 flex-none">Signature Moments</h4>
+                            
+                            <!-- 嚴格的 2x2 網格，確保四張照片長滿剩下版面不溢出 -->
+                            <div id="moments-${item.day}" class="grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-3 flex-1 min-h-0 pb-2">
+                                <label class="upload-label-${item.day} relative moment-col no-print w-full h-full bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden min-h-0">
+                                    <input type="file" class="hidden-input live-upload-input" data-day="${item.day}" accept="image/*" multiple />
+                                    <i data-lucide="camera" class="w-8 h-8 text-gray-300 mb-3 pointer-events-none"></i>
+                                    <span class="text-[11px] font-sans font-black uppercase tracking-[0.3em] text-gray-400 pointer-events-none">添加照片</span>
+                                </label>
                             </div>
-                            <div class="flex flex-col md:flex-row gap-6 mb-6 items-stretch content-row">
-                                <div class="flex-1 text-[18px] md:text-[22px] font-cormorant italic text-[#222] text-justify flex flex-col justify-center content-text">
-                                    <p class="leading-[1.8] tracking-wide my-auto">
-                                        <span class="font-sans font-black not-italic uppercase text-[12px] md:text-[14px] tracking-[0.3em] block mb-2" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
-                                        ${item.description}
-                                    </p>
-                                </div>
-                                <div class="w-full md:w-[45%] shrink-0 relative photo-wrapper flex flex-col">
-                                    <div class="photo-container bg-white p-2 border shadow-sm relative flex-1 flex flex-col">
-                                        <img src="${item.headingPhoto}" class="w-full h-full object-cover block max-h-[160px] md:max-h-[200px]" alt="Cover" />
-                                    </div>
-                                    <div class="w-full text-right mt-2">
-                                        <span class="font-sans text-[9px] md:text-[10px] font-black tracking-[0.3em] px-2 py-1 bg-[#1a1a1a] text-[#D4AF37] uppercase inline-flex items-center gap-2">
-                                            <i data-lucide="map-pin" class="w-3 h-3"></i> ${item.location}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            ${momentsSection}
                         </div>
-                    </article>
+                    </div>
                 </div>
-            </div>
-            `;
+                `;
+            }
         });
         
         // 封底
         htmlContent += `
             <div class="page" data-density="hard">
-                <div class="page-content footer-page bg-[#153F2D] text-[#F9F7F1] flex flex-col justify-center items-center p-8 md:p-16 border-l border-[#0c261b]">
+                <div class="page-content footer-page bg-[#153F2D] text-[#F9F7F1] flex flex-col justify-center items-center p-10 border-l border-[#0c261b]">
                     <i data-lucide="heart" class="mb-10 text-[#D4AF37] w-12 h-12"></i>
-                    <h2 class="text-3xl md:text-4xl font-serif font-black uppercase mb-6 tracking-[0.4em] text-center">世界很美，感謝有您</h2>
-                    <p class="font-cormorant italic text-2xl md:text-3xl mb-16 text-[#D4AF37] text-center">"Enjoy the World with Carl"</p>
-                    <div class="flex justify-center items-center gap-6 md:gap-10 w-full">
+                    <h2 class="text-3xl font-serif font-black uppercase mb-6 tracking-[0.4em] text-center">世界很美，感謝有您</h2>
+                    <p class="font-cormorant italic text-3xl mb-16 text-[#D4AF37] text-center">"Enjoy the World with Carl"</p>
+                    <div class="flex justify-center items-center gap-8 w-full px-6">
                         <div class="flex-1 h-[1px] bg-white/20"></div>
-                        <p class="text-[10px] md:text-[12px] font-sans font-black tracking-[0.5em] uppercase opacity-70">Carl Chan • 專屬回憶冊</p>
+                        <p class="text-[11px] font-sans font-black tracking-[0.5em] uppercase opacity-70">Carl Chan • 專屬回憶冊</p>
                         <div class="flex-1 h-[1px] bg-white/20"></div>
                     </div>
                 </div>
@@ -336,18 +326,19 @@
         // --- 初始化 StPageFlip 翻頁引擎 ---
         let pageFlip;
         function initPageFlip() {
+            // 設定基準尺寸 (嚴格對應 A4 比例：210mm x 297mm 的縮放值)
             pageFlip = new PageFlip(document.getElementById('booklet-root'), {
-                width: 794, // 基準 A4 寬度
-                height: 1123, // 基準 A4 高度
-                size: "fit", // 自動適應螢幕大小，保持比例
+                width: 794, 
+                height: 1123, 
+                size: "stretch", // 已將 "fit" 變更為 "stretch"，以解決 Invalid size type 錯誤
                 minWidth: 315,
                 maxWidth: 1000,
                 minHeight: 420,
                 maxHeight: 1414,
-                maxShadowOpacity: 0.2, // 逼真的書本中縫陰影
+                maxShadowOpacity: 0.2,
                 showCover: true,
                 mobileScrollSupport: true,
-                usePortrait: true // 在手機上自動變為單頁顯示
+                usePortrait: true 
             });
             pageFlip.loadFromHTML(document.querySelectorAll('.page'));
 
@@ -355,14 +346,12 @@
             document.getElementById('btn-prev').addEventListener('click', () => pageFlip.flipPrev());
             document.getElementById('btn-next').addEventListener('click', () => pageFlip.flipNext());
             
-            // 翻頁時的按鈕狀態處理
             pageFlip.on('flip', (e) => {
                 document.getElementById('btn-prev').style.opacity = e.data === 0 ? '0.5' : '1';
                 document.getElementById('btn-next').style.opacity = e.data === pageFlip.getPageCount() - 1 ? '0.5' : '1';
             });
         }
         
-        // 確保 DOM 載入且圖片高度計算完成後再初始化，避免排版跑位
         setTimeout(initPageFlip, 500);
 
         // --- Firebase 與 同步邏輯 ---
@@ -422,6 +411,7 @@
             }, (err) => { setSyncStatus('error'); });
         }
 
+        // 動態生成或更新回憶照片 (嚴格遵循 Grid 單元格與 h-full 限制)
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
             if (!container) return;
@@ -434,16 +424,16 @@
 
             photos.forEach((base64, i) => {
                 const div = document.createElement('div');
-                div.className = 'moment-item moment-col flex flex-col gap-2 h-full';
+                div.className = 'moment-item moment-col flex flex-col h-full min-h-0 w-full';
                 div.innerHTML = `
-                    <div class="photo-container bg-white p-1.5 md:p-2 border shadow-sm relative group flex-1">
-                        <img src="${base64}" class="w-full h-full object-cover max-h-[150px] md:max-h-[220px]" />
+                    <div class="photo-container bg-white p-1 border shadow-sm relative group flex-1 min-h-0 w-full">
+                        <img src="${base64}" class="absolute inset-1.5 w-[calc(100%-12px)] h-[calc(100%-12px)] object-cover block" />
                         <button class="remove-photo-btn no-print print:hidden" data-day="${day}" data-idx="${i}">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
-                    <div class="pl-3 border-l-[2px] border-[#8B2635]/30">
-                        <textarea class="live-caption-box w-full bg-transparent border-none p-0 text-[12px] md:text-[14px] italic leading-relaxed text-gray-800 font-serif outline-none resize-none h-[28px] md:h-[40px]" data-day="${day}" data-idx="${i}" placeholder="在此填寫回憶...">${caps[i] || ""}</textarea>
+                    <div class="pl-2 border-l-[2px] border-[#8B2635]/30 flex-none h-[28px] mt-1.5 w-full">
+                        <textarea class="live-caption-box w-full h-full bg-transparent border-none p-0 text-[12px] md:text-[13px] italic leading-tight text-gray-800 font-serif outline-none resize-none" data-day="${day}" data-idx="${i}" placeholder="在此填寫回憶...">${caps[i] || ""}</textarea>
                     </div>
                 `;
                 const label = container.querySelector('.upload-label-' + day);
