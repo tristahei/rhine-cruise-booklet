@@ -36,28 +36,26 @@
             position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 8px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* 終極列印隱藏設定 */
+        /* 第一重防護：常規列印隱藏設定 */
         @media print { 
-            .no-print, 
-            .remove-photo-btn, 
-            button[class*="remove-photo-btn"], 
-            .photo-container button { 
-                display: none !important; 
-                opacity: 0 !important; 
-                visibility: hidden !important; 
-                width: 0 !important; 
-                height: 0 !important; 
-                pointer-events: none !important;
-                position: absolute !important;
-                z-index: -9999 !important;
-            }
-            .live-caption-box::placeholder { 
-                color: transparent !important; 
-            }
+            .no-print { display: none !important; }
             @page { size: A4; margin: 12mm 10mm; }
             article { page-break-after: always; padding-top: 30px; position: relative; }
             .moment-col { width: 48% !important; display: inline-block !important; margin-right: 2% !important; margin-bottom: 20px; vertical-align: top; }
             .moment-col:nth-child(2n) { margin-right: 0 !important; }
+        }
+
+        /* 第二重防護：JavaScript 列印狀態觸發的隱藏 */
+        body.is-printing .remove-photo-btn,
+        body.is-printing .no-print {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        body.is-printing .live-caption-box::placeholder {
+            color: transparent !important;
         }
     </style>
 </head>
@@ -458,33 +456,51 @@
             }
         }, true);
 
-        // --- 100% 確保列印 PDF 時隱藏按鈕 (JavaScript 終極強制隱藏法) ---
-        // 由於部分瀏覽器可能會忽略 CSS，我們透過 JS 在準備「列印/匯出 PDF」瞬間強制抹除按鈕
-        window.addEventListener('beforeprint', () => {
-            document.querySelectorAll('.remove-photo-btn').forEach(btn => {
-                btn.style.setProperty('display', 'none', 'important');
-                btn.style.setProperty('opacity', '0', 'important');
-            });
-            // 同時隱藏輸入框的浮水印文字
-            document.querySelectorAll('.live-caption-box').forEach(ta => {
-                ta.dataset.placeholder = ta.placeholder;
-                ta.placeholder = '';
-            });
-        });
+        // --- 第三重防護：100% 確保列印 PDF 時隱藏按鈕 (JavaScript 終極強制隱藏法) ---
+        const hideElementsForPrint = () => {
+            document.body.classList.add('is-printing');
+        };
 
-        // 列印視窗關閉或匯出完成後，恢復畫面原狀
-        window.addEventListener('afterprint', () => {
-            document.querySelectorAll('.remove-photo-btn').forEach(btn => {
-                btn.style.removeProperty('display');
-                btn.style.removeProperty('opacity');
+        const restoreElementsAfterPrint = () => {
+            document.body.classList.remove('is-printing');
+        };
+
+        // 攔截瀏覽器原生的列印動作
+        window.addEventListener('beforeprint', hideElementsForPrint);
+        window.addEventListener('afterprint', restoreElementsAfterPrint);
+
+        // 針對 Safari/iOS 等有時會忽略 beforeprint 的設備，加入 matchMedia 防護
+        if (window.matchMedia) {
+            const mediaQueryList = window.matchMedia('print');
+            mediaQueryList.addListener(mql => {
+                if (mql.matches) hideElementsForPrint();
+                else restoreElementsAfterPrint();
             });
-            document.querySelectorAll('.live-caption-box').forEach(ta => {
-                if (ta.dataset.placeholder) {
-                    ta.placeholder = ta.dataset.placeholder;
-                }
-            });
-        });
+        }
 
     </script>
+
+    <!-- 第四重防護：放置於最底部的強制樣式表 (確保不被 Tailwind 等框架覆蓋) -->
+    <style type="text/css">
+        @media print {
+            html body .remove-photo-btn,
+            html body div.photo-container button {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                width: 0 !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                pointer-events: none !important;
+            }
+            html body .live-caption-box::-webkit-input-placeholder,
+            html body .live-caption-box::-moz-placeholder,
+            html body .live-caption-box::placeholder {
+                color: transparent !important;
+            }
+        }
+    </style>
 </body>
 </html>
