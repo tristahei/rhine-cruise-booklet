@@ -34,7 +34,7 @@
         
         /* Photo Removal Button Styling */
         .remove-photo-btn {
-            position: absolute; top: 12px; right: 12px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 6px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 8px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         /* ==========================================
@@ -136,14 +136,14 @@
                 margin-top: 5px !important;
             }
             .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; }
+            .moment-col .photo-container { padding: 4px !important; width: 100% !important; }
             
             /* 顯著放大您的專屬回憶照片，確保4張剛好填滿剩下的A4空間 */
-            .moment-col .photo-container {
+            .moment-col .photo-container img {
                 width: 100% !important;
-                height: 240px !important; /* 固定高度確保列印版面整齊 */
-                padding: 4px !important;
+                height: 275px !important; /* 極大化設定 */
+                object-fit: cover !important;
             }
-            
             .live-caption-box {
                 font-family: 'LXGW WenKai TC', cursive, serif !important; /* 確保列印時的註解也是手寫風 */
                 font-size: 15px !important;
@@ -283,7 +283,7 @@
                 <div class="mt-20 pt-12 border-t border-dashed border-gray-300">
                     <h4 class="font-serif text-2xl font-black italic text-[#8B2635] tracking-widest uppercase mb-12">Signature Moments</h4>
                     <div id="moments-${item.day}" class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                        <label class="upload-label-${item.day} relative moment-col no-print aspect-[4/3] bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden">
+                        <label class="upload-label-${item.day} relative moment-col no-print aspect-square bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden">
                             <input type="file" class="hidden-input live-upload-input" data-day="${item.day}" accept="image/*" multiple />
                             <i data-lucide="camera" class="w-10 h-10 text-gray-300 mb-4 pointer-events-none"></i>
                             <span class="text-[11px] font-sans font-black uppercase tracking-[0.3em] text-gray-400 pointer-events-none">添加照片</span>
@@ -449,7 +449,6 @@
             });
         }
 
-        // 核心更新：使用「雙層影像模糊技術」完美容納照片
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
             if (!container) return;
@@ -463,24 +462,14 @@
             photos.forEach((base64, i) => {
                 const div = document.createElement('div');
                 div.className = 'moment-item moment-col flex flex-col gap-4';
-                
-                // 導入雙層影像設計：外層白框 + 內層(模糊背景 + 清晰前景)
                 div.innerHTML = `
-                    <div class="photo-container bg-white p-2 border shadow-sm relative group w-full aspect-[4/3] flex-none">
-                        <div class="relative w-full h-full overflow-hidden bg-gray-100 flex items-center justify-center rounded-sm">
-                            <!-- 背景層：自動提取照片色彩進行深度模糊，完美填補左右空白 -->
-                            <img src="${base64}" class="absolute inset-0 w-full h-full object-cover blur-[14px] opacity-45 scale-110 pointer-events-none" />
-                            
-                            <!-- 前景層：100% 完整保留、絕不裁切的原始清晰照片 -->
-                            <img src="${base64}" class="relative z-10 w-full h-full object-contain drop-shadow-lg" />
-                        </div>
-                        
-                        <!-- 刪除按鈕 -->
-                        <button class="remove-photo-btn no-print print:hidden z-20 absolute top-3 right-3" data-day="${day}" data-idx="${i}">
+                    <div class="photo-container bg-white p-2.5 border shadow-md relative group">
+                        <img src="${base64}" class="w-full aspect-square object-cover" />
+                        <button class="remove-photo-btn no-print print:hidden" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
-                    <div class="pl-4 border-l-[3px] border-[#8B2635]/20 mt-1">
+                    <div class="pl-4 border-l-2 border-gray-200">
                         <textarea class="live-caption-box w-full bg-transparent border-none p-0 text-[13px] italic leading-relaxed text-gray-800 font-serif outline-none resize-none" rows="2" data-day="${day}" data-idx="${i}" placeholder="在此填寫回憶註解...">${caps[i] || ""}</textarea>
                     </div>
                 `;
@@ -492,7 +481,7 @@
             if (uploadLabel) uploadLabel.style.display = photos.length >= 4 ? 'none' : 'flex';
         }
 
-        async function compressImage(file, maxWidth = 1200) {
+        async function compressImage(file, maxWidth = 700) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -511,7 +500,7 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.85)); 
+                        resolve(canvas.toDataURL('image/jpeg', 0.5)); 
                     };
                 };
             });
