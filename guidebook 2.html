@@ -11,19 +11,20 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts (升級為文青手寫風格) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <style>
         body { 
             background-color: #F9F7F1; 
         }
-        .font-serif { font-family: 'LXGW WenKai TC', serif; }
+        /* 替換為文青手寫風 (霞鶩文楷) 與 英文手寫 (Caveat) */
+        .font-serif { font-family: 'LXGW WenKai TC', cursive, serif; }
         .font-sans { font-family: 'Noto Sans TC', sans-serif; }
-        .font-cinzel { font-family: 'Cinzel', serif; }
-        .font-cormorant { font-family: 'Cormorant Garamond', serif; }
+        .font-cinzel { font-family: 'Cinzel', serif; } /* 保留 Premium 主標題的古典優雅 */
+        .font-cormorant { font-family: 'Caveat', cursive; font-size: 1.3em; letter-spacing: 0.05em; } /* 英文副標與引言改為流暢手寫體 */
         
         .hidden-input { 
             position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 80; display: block; 
@@ -36,76 +37,110 @@
             position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 8px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* 第一重防護：常規列印隱藏設定與【完美 A4 版面最佳化】 */
+        /* ==========================================
+           列印專用終極版面設定 (PDF 匯出最佳化)
+           ========================================== */
         @media print { 
             .no-print { display: none !important; }
             @page { size: A4 portrait; margin: 10mm; }
             
-            /* 將封面與引言整合並獨立為第一頁 */
-            header { padding-top: 2rem !important; border-bottom-width: 4px !important; margin-bottom: 2rem !important; }
-            section.max-w-3xl { page-break-after: always !important; break-after: page !important; margin-bottom: 0 !important; }
+            /* 【封面與引言】獨立頁面且字體巨大化 */
+            header { padding-top: 4rem !important; border-bottom-width: 4px !important; margin-bottom: 2rem !important; }
+            header h1.text-7xl { font-size: 5rem !important; }
+            header h1.md\:text-\[9rem\] { font-size: 8rem !important; }
+            header h2 { font-size: 2.2rem !important; }
+            section.max-w-3xl { page-break-after: always !important; break-after: page !important; margin-bottom: 0 !important; padding-top: 2rem !important; }
+            section.max-w-3xl p { font-size: 22px !important; line-height: 2.8 !important; }
             
-            /* 讓每一天嚴格固定在一頁 A4 */
+            /* 強制單頁 A4 約束 */
             article { 
                 page-break-after: always !important; 
                 break-after: always !important; 
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
-                padding-top: 8mm !important; 
                 margin-bottom: 0 !important; 
-                height: 277mm !important; /* 強制 A4 內容高度 (297mm - 20mm 上下邊距) */
-                overflow: hidden !important; /* 避免任何內容超出單頁 */
+                height: 277mm !important; /* 297mm - 20mm 上下邊緣 */
+                overflow: hidden !important; 
                 display: flex;
                 flex-direction: column;
             }
-            
-            /* 縮小上方標題與留白，把空間全部讓給照片 */
-            .text-8xl, .md\:text-\[7rem\] { font-size: 4rem !important; line-height: 1 !important; }
-            .text-5xl { font-size: 2.2rem !important; line-height: 1.2 !important; }
-            .gap-12 { gap: 1.5rem !important; }
-            .mb-10 { margin-bottom: 1rem !important; }
-            .mb-12 { margin-bottom: 1rem !important; }
-            h4.mb-12 { margin-bottom: 0.5rem !important; } /* Signature Moments 標題下緣 */
-            .mt-20 { margin-top: 1rem !important; }
-            .pt-12 { padding-top: 1rem !important; border-top-width: 2px !important; }
-            .leading-\[2\.6\] { line-height: 1.6 !important; font-size: 14px !important; }
 
-            /* 強制雙欄排版 (避免手機預覽時變為單欄) */
-            .flex-col.md\:flex-row { flex-direction: row !important; align-items: flex-start !important; }
-            .md\:w-\[42\%\] { width: 40% !important; }
-            .flex-1 { flex: 1 !important; padding-right: 1rem !important; }
-            
-            /* 主圖大小控制 (縮小以節省空間) */
-            .photo-container.min-h-\[220px\] { min-height: 0 !important; }
-            .md\:w-\[42\%\] img { max-height: 180px !important; object-fit: cover !important; }
+            /* --------------------------------------
+               情境 1：無上傳照片的頁面 (第1天與最後1天)
+               特徵：無回憶照片，字體與主圖放到最大，填滿A4
+               -------------------------------------- */
+            article.no-moments { justify-content: center !important; padding-top: 0 !important; }
+            article.no-moments .text-8xl { font-size: 6rem !important; }
+            article.no-moments .text-5xl { font-size: 3rem !important; margin-bottom: 2rem !important; }
+            article.no-moments .content-row { height: auto !important; }
+            article.no-moments .content-text p { font-size: 18px !important; line-height: 2.6 !important; }
+            article.no-moments .photo-wrapper { width: 50% !important; }
+            article.no-moments .photo-wrapper img { max-height: 380px !important; height: 380px !important; }
 
-            /* 【重點】專屬回憶網格：極大化簽名照片 */
+            /* --------------------------------------
+               情境 2：常規有回憶照片的頁面 (第2~10天)
+               特徵：加大字型行距、文字與風景圖等高對齊、極大化4張回憶照
+               -------------------------------------- */
+            article.has-moments { padding-top: 6mm !important; }
+            article.has-moments .text-8xl { font-size: 4rem !important; line-height: 1 !important; }
+            article.has-moments .text-5xl { font-size: 2.2rem !important; line-height: 1.2 !important; }
+            
+            /* 文字與旁邊的 Photo 高度完美齊平對齊 */
+            article.has-moments .content-row { 
+                height: 185px !important; /* 固定高度基準 */
+                display: flex !important; 
+                align-items: stretch !important; /* 強制左右等高 */
+                margin-bottom: 15px !important;
+            }
+            article.has-moments .content-text { 
+                display: flex !important; 
+                flex-direction: column !important; 
+                justify-content: center !important; /* 文字垂直置中/分配 */
+            }
+            article.has-moments .content-text p { 
+                font-size: 15px !important; /* 字體加大 */
+                line-height: 2 !important;  /* 行距加寬 */
+                margin: auto 0 !important;  /* 自然佔據高度 */
+            }
+            article.has-moments .photo-wrapper { height: 100% !important; }
+            article.has-moments .photo-wrapper img { height: 100% !important; max-height: 185px !important; object-fit: cover !important; }
+
+            /* 專屬回憶網格 (4張照片極大化) */
             div[id^="moments-"] {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 15px !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px 18px !important; /* 微調間距以適應大照片 */
                 width: 100% !important;
+                margin-top: 5px !important;
             }
-            .moment-col {
-                width: 100% !important;
-                margin: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
-            }
-            .moment-col .photo-container {
-                padding: 5px !important;
-                width: 100% !important;
-            }
-            /* 顯著放大您的專屬回憶照片 */
+            .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; }
+            .moment-col .photo-container { padding: 4px !important; width: 100% !important; }
+            
+            /* 顯著放大您的專屬回憶照片，確保4張剛好填滿剩下的A4空間 */
             .moment-col .photo-container img {
                 width: 100% !important;
-                height: 250px !important; 
+                height: 275px !important; /* 極大化設定 */
                 object-fit: cover !important;
             }
             .live-caption-box {
-                font-size: 12px !important;
+                font-family: 'LXGW WenKai TC', cursive, serif !important; /* 確保列印時的註解也是手寫風 */
+                font-size: 15px !important;
+                line-height: 1.6 !important;
+                height: 35px !important;
+                overflow: hidden !important;
                 margin-top: 4px !important;
             }
+            
+            /* 縮減其他不必要的留白 */
+            .mb-40 { margin-bottom: 0 !important; }
+            .mt-20 { margin-top: 0 !important; }
+            .pt-12 { padding-top: 5px !important; border-top-width: 1px !important; }
+            h4.mb-12 { margin-bottom: 8px !important; font-size: 1.25rem !important; }
+            .gap-12 { gap: 1.5rem !important; }
+            .mb-10 { margin-bottom: 0.8rem !important; }
+            .flex-col.md\:flex-row { flex-direction: row !important; align-items: flex-start !important; }
+            .md\:w-\[42\%\] { width: 40% !important; }
+            .flex-1 { flex: 1 !important; padding-right: 1rem !important; }
         }
 
         /* 第二重防護：JavaScript 列印狀態觸發的隱藏 */
@@ -186,9 +221,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
-        // 👇👇👇 POINT 4: 這裡就是您需要更改的 FIREBASE 設定區塊 👇👇👇
-        // 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
         const firebaseConfig = {
               apiKey: "AIzaSyCJ7Zln_xHCR02DQz8LbNRUqTcNVJm5fSo",
               authDomain: "viva-1st.firebaseapp.com",
@@ -197,10 +229,7 @@
               messagingSenderId: "831844344576",
               appId: "1:831844344576:web:317745d6e257f9b5f5c9e5",
         };
-        // 👆👆👆 請將上方引號內的數值，替換為您從 Firebase 後台複製出來的真實資料 👆👆👆
-        // 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
-        
-        const appId = "premium-rhine-viva-master-v1"; // 如果您有不同的客戶，請更改這裡的名稱（例如："premium-rhine-client-b"）
+        const appId = "premium-rhine-viva-master-v1";
 
         // --- 1. Render the Static Itinerary HTML ---
         const initialItinerary = [
@@ -222,7 +251,10 @@
 
         initialItinerary.forEach(item => {
             const dayNum = item.day < 10 ? `0${item.day}` : item.day;
-            const momentsSection = (item.day !== 1 && item.day !== 11) ? `
+            const isNoMoments = (item.day === 1 || item.day === 11);
+            const articleClass = isNoMoments ? "no-moments" : "has-moments";
+            
+            const momentsSection = !isNoMoments ? `
                 <div class="mt-20 pt-12 border-t border-dashed border-gray-300">
                     <h4 class="font-serif text-2xl font-black italic text-[#8B2635] tracking-widest uppercase mb-12">Signature Moments</h4>
                     <div id="moments-${item.day}" class="grid grid-cols-1 sm:grid-cols-2 gap-10">
@@ -236,8 +268,8 @@
             ` : '';
 
             htmlContent += `
-            <article class="mb-40 pt-12 border-t-2 border-[#1a1a1a] relative">
-                <div class="absolute top-6 right-0 z-10 opacity-60 pointer-events-none">
+            <article class="mb-40 pt-12 border-t-2 border-[#1a1a1a] relative ${articleClass}">
+                <div class="absolute top-6 right-0 z-10 opacity-60 pointer-events-none no-print">
                     <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Logo" class="h-24 w-auto" />
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -249,15 +281,15 @@
                             <span class="block text-xl font-cormorant italic text-gray-400 mb-3">${item.date}</span>
                             <h3 class="text-5xl font-serif font-black tracking-tight leading-tight">${item.title}</h3>
                         </div>
-                        <div class="flex flex-col md:flex-row gap-12 mb-12 items-stretch">
-                            <div class="flex-1 text-xl font-serif text-[#222] text-justify flex flex-col justify-center">
-                                <p class="leading-[2.6] tracking-wide">
-                                    <span class="font-black uppercase text-[16px] tracking-[0.3em] mr-4" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
+                        <div class="flex flex-col md:flex-row gap-12 mb-12 items-stretch content-row">
+                            <div class="flex-1 text-xl font-serif text-[#222] text-justify flex flex-col justify-center content-text">
+                                <p class="leading-[2.2] tracking-wide my-auto">
+                                    <span class="font-black uppercase text-[16px] tracking-[0.3em] block mb-3" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
                                     ${item.description}
                                 </p>
                             </div>
-                            <div class="w-full md:w-[42%] shrink-0 relative">
-                                <div class="photo-container bg-white p-2 border shadow-lg relative flex flex-col min-h-[220px]">
+                            <div class="w-full md:w-[42%] shrink-0 relative photo-wrapper">
+                                <div class="photo-container bg-white p-2 border shadow-lg relative flex flex-col h-full">
                                     <img src="${item.headingPhoto}" class="w-full h-full object-cover block" alt="Cover" />
                                 </div>
                                 <div class="w-full text-right mt-2">
@@ -348,7 +380,6 @@
                             await signInAnonymously(auth); 
                         } catch(e) { 
                             console.error("Firebase Login Error:", e); 
-                            // 檢查是否為尚未啟用「匿名登入」的錯誤
                             if (e.code === 'auth/admin-restricted-operation' || e.code === 'auth/operation-not-allowed') {
                                 setSyncStatus('error_auth_disabled');
                                 showErrorBanner('Firebase 登入設定錯誤', '您的專案尚未啟用「匿名登入」。請前往 Firebase Console -> Authentication -> Sign-in method 啟用「Anonymous」。');
@@ -552,15 +583,9 @@
         // --- 針對手機版瀏覽器 (Mobile Chrome/Safari) 新增的獨立「列印」按鈕事件 ---
         // 解決手機瀏覽器分享為 PDF 時抓不到 JS 列印狀態的問題
         document.getElementById('mobile-print-btn')?.addEventListener('click', () => {
-            // 先強制改變畫面 (隱藏不需要列印的元素)
             hideElementsForPrint();
-            
-            // 給瀏覽器一點時間去重新渲染畫面 (100毫秒)
             setTimeout(() => {
-                // 呼叫系統列印介面
                 window.print();
-                
-                // 等待一段時間後恢復畫面 (給予使用者操作列印介面的緩衝時間)
                 setTimeout(() => {
                     restoreElementsAfterPrint();
                 }, 2000);
