@@ -24,7 +24,7 @@
         .font-serif { font-family: 'LXGW WenKai TC', cursive, serif; }
         .font-sans { font-family: 'Noto Sans TC', sans-serif; }
         .font-cinzel { font-family: 'Cinzel', serif; } /* 保留 Premium 主標題的古典優雅 */
-        .font-cormorant { font-family: 'Caveat', cursive; font-size: 1.3em; letter-spacing: 0.05em; } /* 英文副標與引言改為流暢手寫體 */
+        .font-cormorant { font-family: 'Caveat', 'LXGW WenKai TC', cursive; font-size: 1.3em; letter-spacing: 0.05em; } /* 英文副標與引言改為流暢手寫體 */
         
         .hidden-input { 
             position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 80; display: block; 
@@ -44,15 +44,26 @@
             .no-print { display: none !important; }
             @page { size: A4 portrait; margin: 10mm; }
             
-            /* 【封面與引言】獨立頁面且字體巨大化 */
-            header { padding-top: 4rem !important; border-bottom-width: 4px !important; margin-bottom: 2rem !important; }
-            header h1.text-7xl { font-size: 5rem !important; }
-            header h1.md\:text-\[9rem\] { font-size: 8rem !important; }
-            header h2 { font-size: 2.2rem !important; }
-            section.max-w-3xl { page-break-after: always !important; break-after: page !important; margin-bottom: 0 !important; padding-top: 2rem !important; }
-            section.max-w-3xl p { font-size: 22px !important; line-height: 2.8 !important; }
+            /* 【封面與引言】強制包裝在一頁 A4 內垂直置中 */
+            .cover-page {
+                page-break-after: always !important;
+                break-after: always !important;
+                height: 277mm !important; /* 嚴格限制一頁 A4 內部高度 */
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important; /* 上下完美置中 */
+                padding-top: 0 !important;
+                margin-bottom: 0 !important;
+            }
+            .cover-page header { padding-top: 0 !important; border-bottom-width: 4px !important; margin-bottom: 2rem !important; }
+            .cover-page header h1.text-7xl { font-size: 4.5rem !important; }
+            .cover-page header h1.md\:text-\[9rem\] { font-size: 6.5rem !important; }
+            .cover-page header h2 { font-size: 2rem !important; }
+            .cover-page section.max-w-3xl { page-break-after: auto !important; break-after: auto !important; margin-bottom: 0 !important; padding-top: 1rem !important; }
+            .cover-page section.max-w-3xl p { font-size: 20px !important; line-height: 2.2 !important; }
             
-            /* 強制單頁 A4 約束 */
+            /* 強制單頁 A4 約束 (每天的內容) */
             article { 
                 page-break-after: always !important; 
                 break-after: always !important; 
@@ -73,7 +84,12 @@
             article.no-moments .text-8xl { font-size: 6rem !important; }
             article.no-moments .text-5xl { font-size: 3rem !important; margin-bottom: 2rem !important; }
             article.no-moments .content-row { height: auto !important; }
-            article.no-moments .content-text p { font-size: 18px !important; line-height: 2.6 !important; }
+            article.no-moments .content-text p { 
+                font-size: 21px !important; /* 放大字體 */
+                line-height: 2.4 !important; 
+                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; /* 套用手寫風格 */
+                font-style: italic !important;
+            }
             article.no-moments .photo-wrapper { width: 50% !important; }
             article.no-moments .photo-wrapper img { max-height: 380px !important; height: 380px !important; }
 
@@ -98,10 +114,16 @@
                 justify-content: center !important; /* 文字垂直置中/分配 */
             }
             article.has-moments .content-text p { 
-                font-size: 15px !important; /* 字體加大 */
-                line-height: 2 !important;  /* 行距加寬 */
+                font-size: 17.5px !important; /* 顯著加大字體 */
+                line-height: 1.8 !important;  /* 行距加寬 */
                 margin: auto 0 !important;  /* 自然佔據高度 */
+                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; /* 與日期同步手寫風 */
+                font-style: italic !important;
             }
+            /* 地點標籤保持端正不變形 */
+            article.has-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
+            article.no-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
+
             article.has-moments .photo-wrapper { height: 100% !important; }
             article.has-moments .photo-wrapper img { height: 100% !important; max-height: 185px !important; object-fit: cover !important; }
 
@@ -170,36 +192,39 @@
     <!-- Dynamic Container for the Booklet -->
     <div id="booklet-root" class="max-w-7xl mx-auto relative">
         
-        <!-- Header -->
-        <header class="px-6 pt-24 pb-16 max-w-7xl mx-auto text-center border-b-[6px] border-double border-[#1a1a1a] mb-16">
-            <p class="font-cormorant italic text-xl text-gray-500 mb-4 tracking-widest">Escorted by Carl Chan</p>
-            <h1 class="text-7xl md:text-[9rem] font-cinzel font-bold uppercase tracking-tighter mb-2 leading-none text-[#5D4037]">Premium</h1>
-            <h1 class="text-4xl md:text-6xl font-cinzel font-semibold uppercase tracking-[0.4em] mb-8 text-[#5D4037]">Holidays</h1>
-            <h2 class="text-3xl md:text-4xl font-serif font-black tracking-[0.3em] mb-10 text-[#8B2635]">萊茵河之旅 • 時光紀實</h2>
-            <div class="flex flex-wrap justify-center md:justify-between items-center border-t-2 border-b-2 border-[#1a1a1a] py-6 mt-8 gap-6 px-6">
-                <span class="font-sans font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3">
-                    <i data-lucide="newspaper" class="w-[18px] h-[18px] text-[#8B2635]"></i> Viva Cruises
-                </span>
-                <span class="font-serif italic text-2xl md:text-3xl font-black">@康爺帶您嘆世界</span>
-                <span class="font-sans font-black text-[11px] uppercase tracking-[0.3em]">11 Days / 德 • 法 • 瑞</span>
-            </div>
-        </header>
+        <!-- 將封面與引言包裹起來，確保列印時鎖死在同一頁 -->
+        <div class="cover-page min-h-screen flex flex-col justify-center">
+            <!-- Header -->
+            <header class="px-6 pt-16 pb-16 max-w-7xl mx-auto text-center border-b-[6px] border-double border-[#1a1a1a] mb-12">
+                <p class="font-cormorant italic text-xl text-gray-500 mb-4 tracking-widest">Escorted by Carl Chan</p>
+                <h1 class="text-7xl md:text-[9rem] font-cinzel font-bold uppercase tracking-tighter mb-2 leading-none text-[#5D4037]">Premium</h1>
+                <h1 class="text-4xl md:text-6xl font-cinzel font-semibold uppercase tracking-[0.4em] mb-8 text-[#5D4037]">Holidays</h1>
+                <h2 class="text-3xl md:text-4xl font-serif font-black tracking-[0.3em] mb-10 text-[#8B2635]">萊茵河之旅 • 時光紀實</h2>
+                <div class="flex flex-wrap justify-center md:justify-between items-center border-t-2 border-b-2 border-[#1a1a1a] py-6 mt-8 gap-6 px-6">
+                    <span class="font-sans font-black text-[11px] uppercase tracking-[0.3em] flex items-center gap-3">
+                        <i data-lucide="newspaper" class="w-[18px] h-[18px] text-[#8B2635]"></i> Viva Cruises
+                    </span>
+                    <span class="font-serif italic text-2xl md:text-3xl font-black">@康爺帶您嘆世界</span>
+                    <span class="font-sans font-black text-[11px] uppercase tracking-[0.3em]">11 Days / 德 • 法 • 瑞</span>
+                </div>
+            </header>
 
-        <!-- Intro Section -->
-        <section class="max-w-3xl mx-auto px-8 mb-32 text-center">
-            <p class="font-serif text-2xl leading-[2.6] text-gray-800 italic tracking-wide">
-                「致我最尊貴的貴賓們：<br/><br/>
-                旅程的長度可以用天數計算，但我們共同創造的回憶，卻是超越時間的無價之寶。這本紀念冊，是我為您準備的心意。這裡記錄了萊茵河畔的微風，與我們舉杯共飲的歡笑。<br/><br/>
-                請在此上傳您的視角，讓我為您的每一個精彩瞬間，寫下最真摯的註解。期待下一次，我們再次一同探索美麗的世界。」
-            </p>
-            <div class="flex justify-center items-center gap-6 mt-16">
-                <p class="font-sans font-black tracking-[0.3em] text-[12px] text-[#8B2635] uppercase">—— Your Private Escort, Carl 敬上</p>
-                <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Carl's Logo" class="h-20 w-auto object-contain mix-blend-multiply" />
-            </div>
-        </section>
+            <!-- Intro Section -->
+            <section class="max-w-3xl mx-auto px-8 text-center">
+                <p class="font-serif text-2xl leading-[2.6] text-gray-800 italic tracking-wide">
+                    「致我最尊貴的貴賓們：<br/><br/>
+                    旅程的長度可以用天數計算，但我們共同創造的回憶，卻是超越時間的無價之寶。這本紀念冊，是我為您準備的心意。這裡記錄了萊茵河畔的微風，與我們舉杯共飲的歡笑。<br/><br/>
+                    請在此上傳您的視角，讓我為您的每一個精彩瞬間，寫下最真摯的註解。期待下一次，我們再次一同探索美麗的世界。」
+                </p>
+                <div class="flex justify-center items-center gap-6 mt-16">
+                    <p class="font-cormorant font-black text-2xl text-[#8B2635]">—— Your Private Escort, Carl 敬上</p>
+                    <img src="https://i.postimg.cc/t4zywrjF/Carl-s-logo-without-background.png" alt="Carl's Logo" class="h-20 w-auto object-contain mix-blend-multiply" />
+                </div>
+            </section>
+        </div>
 
         <!-- Main Itinerary (Generated by JS below) -->
-        <main id="itinerary-container" class="max-w-7xl mx-auto px-6"></main>
+        <main id="itinerary-container" class="max-w-7xl mx-auto px-6 mt-20"></main>
 
         <!-- Footer -->
         <footer class="bg-[#153F2D] text-[#F9F7F1] py-32 text-center mt-32 print:bg-white print:text-black print:border-t-4">
@@ -282,9 +307,9 @@
                             <h3 class="text-5xl font-serif font-black tracking-tight leading-tight">${item.title}</h3>
                         </div>
                         <div class="flex flex-col md:flex-row gap-12 mb-12 items-stretch content-row">
-                            <div class="flex-1 text-xl font-serif text-[#222] text-justify flex flex-col justify-center content-text">
+                            <div class="flex-1 text-[24px] font-cormorant italic text-[#222] text-justify flex flex-col justify-center content-text">
                                 <p class="leading-[2.2] tracking-wide my-auto">
-                                    <span class="font-black uppercase text-[16px] tracking-[0.3em] block mb-3" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
+                                    <span class="font-sans font-black not-italic uppercase text-[16px] tracking-[0.3em] block mb-3" style="color: ${item.color}">${item.location.split('，')[0]} —</span>
                                     ${item.description}
                                 </p>
                             </div>
