@@ -141,9 +141,9 @@
             /* 顯著放大您的專屬回憶照片，確保4張剛好填滿剩下的A4空間 */
             .moment-col .photo-container img {
                 width: 100% !important;
-                height: auto !important; /* 讓高度自動適應照片比例，完全貼合不留白 */
-                max-height: 250px !important; /* 限制最大高度，防止極端直圖破壞 A4 排版 */
-                object-fit: cover !important;
+                height: 240px !important; /* 固定高度確保版面整齊 */
+                object-fit: contain !important; /* 絕對不裁切任何邊緣，保證完整呈現 */
+                background-color: #f9fafb !important; /* 補上極淡的相紙底色 */
             }
             .live-caption-box {
                 font-family: 'LXGW WenKai TC', cursive, serif !important; /* 確保列印時的註解也是手寫風 */
@@ -465,7 +465,7 @@
                 div.className = 'moment-item moment-col flex flex-col gap-4';
                 div.innerHTML = `
                     <div class="photo-container bg-white p-2.5 border shadow-md relative group">
-                        <img src="${base64}" class="w-full h-auto max-h-[350px] object-cover" />
+                        <img src="${base64}" class="w-full aspect-[4/3] object-contain bg-gray-50" />
                         <button class="remove-photo-btn no-print print:hidden" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
