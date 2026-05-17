@@ -137,17 +137,20 @@
             }
             .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: flex-start !important; }
             
-            /* 列印時：相框與照片的高度自適應 */
+            /* 列印時：讓白框緊緊貼合照片寬度，不留下過大白邊 */
             .moment-col .photo-container {
-                width: 100% !important;
-                height: auto !important; /* 解除高度限制，讓白框貼合照片 */
+                width: fit-content !important; /* 解除 100% 寬度限制，改為貼合內容 */
+                max-width: 100% !important;
+                height: auto !important; 
                 padding: 4px !important;
                 display: flex !important;
                 justify-content: center !important;
                 align-items: center !important;
+                margin: 0 auto !important; /* 相框置中 */
             }
             .moment-col .photo-container img {
-                width: 100% !important;
+                width: auto !important; /* 解除 100% 寬度限制 */
+                max-width: 100% !important;
                 height: auto !important;
                 max-height: 250px !important; /* 限制最大高度避免單頁溢出 */
                 object-fit: contain !important; /* 確保不裁切 */
@@ -288,7 +291,7 @@
                 <div class="mt-20 pt-12 border-t border-dashed border-gray-300">
                     <h4 class="font-serif text-2xl font-black italic text-[#8B2635] tracking-widest uppercase mb-12">Signature Moments</h4>
                     <div id="moments-${item.day}" class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                        <label class="upload-label-${item.day} relative moment-col no-print aspect-[4/3] bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden">
+                        <label class="upload-label-${item.day} relative moment-col no-print w-full aspect-[4/3] bg-white border-[3px] border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F9F7F1] transition-all overflow-hidden">
                             <input type="file" class="hidden-input live-upload-input" data-day="${item.day}" accept="image/*" multiple />
                             <i data-lucide="camera" class="w-10 h-10 text-gray-300 mb-4 pointer-events-none"></i>
                             <span class="text-[11px] font-sans font-black uppercase tracking-[0.3em] text-gray-400 pointer-events-none">添加照片</span>
@@ -409,7 +412,7 @@
             }, (err) => { setSyncStatus('error'); });
         }
 
-        // 核心更新：極簡自適應相框 (移除模糊，外框自動變形貼合照片)
+        // 核心更新：極簡自適應相框 (外框自動變形貼合照片，不留多餘白邊)
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
             if (!container) return;
@@ -422,13 +425,13 @@
 
             photos.forEach((base64, i) => {
                 const div = document.createElement('div');
-                div.className = 'moment-item moment-col flex flex-col gap-3 justify-start';
+                div.className = 'moment-item moment-col flex flex-col gap-3 justify-start items-center';
                 
-                // 完全移除 aspect-[4/3] 和模糊層，讓白框(photo-container)與 img 同時使用 h-auto 互相貼合
+                // 相框改為 w-fit max-w-full，會自動緊縮包覆照片寬度
                 div.innerHTML = `
-                    <div class="photo-container bg-white p-2 border shadow-sm relative group w-full flex justify-center items-center rounded-sm">
-                        <img src="${base64}" class="w-full h-auto max-h-[300px] object-contain block" />
-                        <button class="remove-photo-btn no-print print:hidden absolute top-2 right-2 z-20" data-day="${day}" data-idx="${i}">
+                    <div class="photo-container bg-white p-2 border shadow-sm relative group w-fit max-w-full flex justify-center items-center rounded-sm mx-auto">
+                        <img src="${base64}" class="w-auto h-auto max-w-full max-h-[300px] object-contain block" />
+                        <button class="remove-photo-btn no-print print:hidden absolute -top-2 -right-2 z-20" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
