@@ -32,9 +32,9 @@
         .moment-col label * { pointer-events: none; }
         .no-print { display: block; }
         
-        /* Photo Removal Button Styling */
+        /* Photo Removal Button Styling (移除固定定位，交由 Tailwind 控制，讓按鈕完美落在框外) */
         .remove-photo-btn {
-            position: absolute; top: 12px; right: 12px; background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 6px; border: none; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         /* ==========================================
@@ -135,25 +135,22 @@
                 width: 100% !important;
                 margin-top: 5px !important;
             }
-            .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: flex-start !important; }
+            .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: flex-start !important; align-items: center !important; }
             
             /* 列印時：讓白框緊緊貼合照片寬度，不留下過大白邊 */
             .moment-col .photo-container {
-                width: fit-content !important; /* 解除 100% 寬度限制，改為貼合內容 */
+                display: inline-block !important; /* 使用 inline-block 確保外框完美貼合內容 */
                 max-width: 100% !important;
-                height: auto !important; 
                 padding: 4px !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
                 margin: 0 auto !important; /* 相框置中 */
             }
             .moment-col .photo-container img {
-                width: auto !important; /* 解除 100% 寬度限制 */
+                width: auto !important;
                 max-width: 100% !important;
                 height: auto !important;
                 max-height: 250px !important; /* 限制最大高度避免單頁溢出 */
                 object-fit: contain !important; /* 確保不裁切 */
+                display: block !important;
             }
             
             .live-caption-box {
@@ -412,7 +409,7 @@
             }, (err) => { setSyncStatus('error'); });
         }
 
-        // 核心更新：極簡自適應相框 (外框自動變形貼合照片，不留多餘白邊)
+        // 核心更新：透過 Inline-Block 讓白框 100% 精準貼合真實圖片渲染的寬度，完美消除過寬白邊
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
             if (!container) return;
@@ -427,11 +424,11 @@
                 const div = document.createElement('div');
                 div.className = 'moment-item moment-col flex flex-col gap-3 justify-start items-center';
                 
-                // 相框改為 w-fit max-w-full，會自動緊縮包覆照片寬度
+                // 改用 relative inline-block 來精準收縮包覆
                 div.innerHTML = `
-                    <div class="photo-container bg-white p-2 border shadow-sm relative group w-fit max-w-full flex justify-center items-center rounded-sm mx-auto">
-                        <img src="${base64}" class="w-auto h-auto max-w-full max-h-[300px] object-contain block" />
-                        <button class="remove-photo-btn no-print print:hidden absolute -top-2 -right-2 z-20" data-day="${day}" data-idx="${i}">
+                    <div class="photo-container bg-white p-2 border shadow-sm relative inline-block rounded-sm mx-auto">
+                        <img src="${base64}" class="w-auto h-auto max-w-full max-h-[280px] object-contain block" />
+                        <button class="remove-photo-btn no-print print:hidden absolute -top-3 -right-3 z-20" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
