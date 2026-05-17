@@ -32,7 +32,7 @@
         .moment-col label * { pointer-events: none; }
         .no-print { display: block; }
         
-        /* Photo Removal Button Styling (移除固定定位，交由 Tailwind 控制，讓按鈕完美落在框外) */
+        /* Photo Removal Button Styling */
         .remove-photo-btn {
             background: rgba(220, 38, 38, 0.95); color: white; border-radius: 9999px; padding: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
@@ -137,20 +137,25 @@
             }
             .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: flex-start !important; align-items: center !important; }
             
-            /* 列印時：讓白框緊緊貼合照片寬度，不留下過大白邊 */
+            /* 列印時：終極貼合，樣式直接作用於 img */
             .moment-col .photo-container {
-                display: inline-block !important; /* 使用 inline-block 確保外框完美貼合內容 */
+                display: inline-flex !important; 
                 max-width: 100% !important;
-                padding: 4px !important;
-                margin: 0 auto !important; /* 相框置中 */
+                padding: 0 !important; 
+                margin: 0 auto !important; 
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
             }
             .moment-col .photo-container img {
                 width: auto !important;
                 max-width: 100% !important;
                 height: auto !important;
                 max-height: 250px !important; /* 限制最大高度避免單頁溢出 */
-                object-fit: contain !important; /* 確保不裁切 */
                 display: block !important;
+                background-color: white !important;
+                padding: 6px !important;
+                border: 1px solid #e5e7eb !important;
             }
             
             .live-caption-box {
@@ -409,7 +414,7 @@
             }, (err) => { setSyncStatus('error'); });
         }
 
-        // 核心更新：透過 Inline-Block 讓白框 100% 精準貼合真實圖片渲染的寬度，完美消除過寬白邊
+        // 終極解法：將白底與內邊距直接加在 img 標籤上，100%保證所有瀏覽器 (含 Firefox) 外框絕對貼合照片像素
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
             if (!container) return;
@@ -422,12 +427,12 @@
 
             photos.forEach((base64, i) => {
                 const div = document.createElement('div');
-                div.className = 'moment-item moment-col flex flex-col gap-3 justify-start items-center';
+                div.className = 'moment-item moment-col flex flex-col gap-3 justify-start items-center w-full';
                 
-                // 改用 relative inline-block 來精準收縮包覆
+                // 完全捨棄 div 容器的樣式，直接用 img 的 padding/background 來做相框
                 div.innerHTML = `
-                    <div class="photo-container bg-white p-2 border shadow-sm relative inline-block rounded-sm mx-auto">
-                        <img src="${base64}" class="w-auto h-auto max-w-full max-h-[280px] object-contain block" />
+                    <div class="photo-container relative inline-flex justify-center items-center max-w-full mx-auto group">
+                        <img src="${base64}" class="bg-white p-[6px] border border-gray-200 shadow-sm rounded-sm block w-auto h-auto max-w-full max-h-[280px]" />
                         <button class="remove-photo-btn no-print print:hidden absolute -top-3 -right-3 z-20" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
@@ -470,7 +475,7 @@
         }
 
         document.addEventListener('change', async (e) => {
-            if (e.target.classList.contains('live-upload-input')) {
+            if (e.target?.classList?.contains('live-upload-input')) {
                 const day = e.target.dataset.day;
                 const files = Array.from(e.target.files);
                 if (!files.length) return;
@@ -494,7 +499,7 @@
         });
 
         document.addEventListener('click', async (e) => {
-            const removeBtn = e.target.closest('.remove-photo-btn');
+            const removeBtn = e.target?.closest?.('.remove-photo-btn');
             if (removeBtn && user && db) {
                 setSyncStatus('syncing');
                 const day = removeBtn.dataset.day;
@@ -518,7 +523,7 @@
         });
 
         document.addEventListener('blur', async (e) => {
-            if (e.target.classList.contains('live-caption-box') && user && db) {
+            if (e.target?.classList?.contains('live-caption-box') && user && db) {
                 setSyncStatus('syncing');
                 const day = e.target.dataset.day;
                 const idx = parseInt(e.target.dataset.idx);
