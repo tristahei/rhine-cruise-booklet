@@ -360,7 +360,8 @@
             else if (status === 'saved') { dot.style.background = '#10b981'; txt.innerText = '已儲存到雲端'; setTimeout(()=>setSyncStatus('idle'), 3000); }
             else if (status === 'idle') { dot.style.background = '#10b981'; txt.innerText = '雲端已連線'; }
             else if (status === 'error_auth_disabled') { dot.style.background = '#ef4444'; txt.innerText = '錯誤：請在 Firebase 啟用「匿名登入」'; }
-            else if (status === 'error_firestore_disabled') { dot.style.background = '#ef4444'; txt.innerText = '錯誤：Firestore 未建立或權限遭拒'; }
+            else if (status === 'error_firestore_disabled') { dot.style.background = '#ef4444'; txt.innerText = '權限錯誤：請至 Firebase 將 Rules 設為 true'; }
+            else if (status === 'error_network') { dot.style.background = '#ef4444'; txt.innerText = '連線超時：請關閉防護套件或切換網路'; }
             else if (status === 'error') { dot.style.background = '#ef4444'; txt.innerText = '同步失敗 - 請確認網路與設定'; }
             else if (status === 'local') { dot.style.background = '#f59e0b'; txt.innerText = '本地模式 (Firebase 未配置)'; }
         }
@@ -413,7 +414,16 @@
                     remoteData[dayStr] = data;
                     updateDOM(dayStr, data);
                 });
-            }, (err) => { setSyncStatus('error'); });
+            }, (err) => { 
+                console.error("Firestore Sync Error:", err);
+                if (err.code === 'permission-denied') {
+                    setSyncStatus('error_firestore_disabled');
+                } else if (err.code === 'unavailable' || err.message.includes('10 seconds')) {
+                    setSyncStatus('error_network');
+                } else {
+                    setSyncStatus('error');
+                }
+            });
         }
 
         function updateDOM(day, data) {
