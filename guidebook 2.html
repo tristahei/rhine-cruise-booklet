@@ -42,13 +42,17 @@
            ========================================== */
         @media print { 
             .no-print { display: none !important; }
-            @page { size: A4 portrait; margin: 10mm; }
+            @page { size: A4 portrait; margin: 8mm; } /* 微調邊距，提供安全緩衝 */
             
+            /* 歸零所有外圍容器的潛在邊距，這是產生多餘空白頁的元兇 */
+            html, body { margin: 0 !important; padding: 0 !important; background-color: white !important; }
+            #booklet-root, #itinerary-container { margin: 0 !important; padding: 0 !important; }
+
             /* 【封面與引言】強制包裝在一頁 A4 內垂直置中 */
             .cover-page {
                 page-break-after: always !important;
-                break-after: always !important;
-                height: 277mm !important; /* 嚴格限制一頁 A4 內部高度 */
+                break-after: page !important;
+                height: 260mm !important; /* 從 277mm 縮小為 260mm，徹底避免觸碰瀏覽器分頁邊界 */
                 overflow: hidden !important;
                 display: flex !important;
                 flex-direction: column !important;
@@ -66,11 +70,12 @@
             /* 強制單頁 A4 約束 (每天的內容) */
             article { 
                 page-break-after: always !important; 
-                break-after: always !important; 
+                break-after: page !important; 
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
+                margin-top: 0 !important;
                 margin-bottom: 0 !important; 
-                height: 277mm !important; /* 297mm - 20mm 上下邊緣 */
+                height: 260mm !important; /* 從 277mm 縮小為 260mm，完美適應 Default 與 None 邊界 */
                 overflow: hidden !important; 
                 display: flex;
                 flex-direction: column;
@@ -78,24 +83,22 @@
 
             /* --------------------------------------
                情境 1：無上傳照片的頁面 (第1天與最後1天)
-               特徵：無回憶照片，字體與主圖放到最大，填滿A4
                -------------------------------------- */
             article.no-moments { justify-content: center !important; padding-top: 0 !important; }
             article.no-moments .text-8xl { font-size: 6rem !important; }
             article.no-moments .text-5xl { font-size: 3rem !important; margin-bottom: 2rem !important; }
             article.no-moments .content-row { height: auto !important; }
             article.no-moments .content-text p { 
-                font-size: 21px !important; /* 放大字體 */
+                font-size: 21px !important; 
                 line-height: 2.4 !important; 
-                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; /* 套用手寫風格 */
+                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important;
                 font-style: italic !important;
             }
             article.no-moments .photo-wrapper { width: 50% !important; }
-            article.no-moments .photo-wrapper img { max-height: 380px !important; height: 380px !important; }
+            article.no-moments .photo-wrapper img { max-height: 350px !important; height: 350px !important; }
 
             /* --------------------------------------
                情境 2：常規有回憶照片的頁面 (第2~10天)
-               特徵：保持字型行距不變、極大化4張回憶照
                -------------------------------------- */
             article.has-moments { padding-top: 6mm !important; }
             article.has-moments .text-8xl { font-size: 4rem !important; line-height: 1 !important; }
@@ -103,25 +106,23 @@
             
             /* 文字與旁邊的 Photo 高度完美齊平對齊 */
             article.has-moments .content-row { 
-                height: 185px !important; /* 固定高度基準 */
+                height: 185px !important; 
                 display: flex !important; 
-                align-items: stretch !important; /* 強制左右等高 */
+                align-items: stretch !important; 
                 margin-bottom: 15px !important;
             }
             article.has-moments .content-text { 
                 display: flex !important; 
                 flex-direction: column !important; 
-                justify-content: center !important; /* 文字垂直置中/分配 */
+                justify-content: center !important;
             }
-            /* ❗ 嚴格保留原本的文字大小與行距 ❗ */
             article.has-moments .content-text p { 
-                font-size: 17.5px !important; /* 保持不變 */
-                line-height: 1.8 !important;  /* 保持不變 */
+                font-size: 17.5px !important; 
+                line-height: 1.8 !important;  
                 margin: auto 0 !important;
                 font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important;
                 font-style: italic !important;
             }
-            /* 地點標籤保持端正不變形 */
             article.has-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
             article.no-moments .content-text span { font-family: 'Noto Sans TC', sans-serif !important; font-style: normal !important; }
 
@@ -138,7 +139,6 @@
             }
             .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: flex-start !important; align-items: center !important; }
             
-            /* 列印時：終極貼合，樣式直接作用於 img，取消文字後照片允許更高 */
             .moment-col .photo-container {
                 display: inline-flex !important; 
                 max-width: 100% !important;
@@ -152,7 +152,7 @@
                 width: auto !important;
                 max-width: 100% !important;
                 height: auto !important;
-                max-height: 300px !important; /* ❗高度顯著加大(原250)，完美填補取消文字後的空間 */
+                max-height: 290px !important; /* 配合 260mm 的總高度微調 */
                 display: block !important;
                 background-color: white !important;
                 padding: 6px !important;
@@ -169,6 +169,19 @@
             .flex-col.md\:flex-row { flex-direction: row !important; align-items: flex-start !important; }
             .md\:w-\[42\%\] { width: 40% !important; }
             .flex-1 { flex: 1 !important; padding-right: 1rem !important; }
+
+            /* 確保頁尾也獨立完美成為一頁，且不引發後續空白頁 */
+            footer {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+                page-break-inside: avoid !important;
+                height: 260mm !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
         }
 
         /* 第二重防護：JavaScript 列印狀態觸發的隱藏 */
