@@ -95,7 +95,7 @@
 
             /* --------------------------------------
                情境 2：常規有回憶照片的頁面 (第2~10天)
-               特徵：加大字型行距、文字與風景圖等高對齊、極大化4張回憶照
+               特徵：保持字型行距不變、極大化4張回憶照
                -------------------------------------- */
             article.has-moments { padding-top: 6mm !important; }
             article.has-moments .text-8xl { font-size: 4rem !important; line-height: 1 !important; }
@@ -113,11 +113,12 @@
                 flex-direction: column !important; 
                 justify-content: center !important; /* 文字垂直置中/分配 */
             }
+            /* ❗ 嚴格保留原本的文字大小與行距 ❗ */
             article.has-moments .content-text p { 
-                font-size: 17.5px !important; /* 顯著加大字體 */
-                line-height: 1.8 !important;  /* 行距加寬 */
-                margin: auto 0 !important;  /* 自然佔據高度 */
-                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important; /* 與日期同步手寫風 */
+                font-size: 17.5px !important; /* 保持不變 */
+                line-height: 1.8 !important;  /* 保持不變 */
+                margin: auto 0 !important;
+                font-family: 'Caveat', 'LXGW WenKai TC', cursive, serif !important;
                 font-style: italic !important;
             }
             /* 地點標籤保持端正不變形 */
@@ -137,7 +138,7 @@
             }
             .moment-col { margin: 0 !important; display: flex !important; flex-direction: column !important; justify-content: flex-start !important; align-items: center !important; }
             
-            /* 列印時：終極貼合，樣式直接作用於 img */
+            /* 列印時：終極貼合，樣式直接作用於 img，取消文字後照片允許更高 */
             .moment-col .photo-container {
                 display: inline-flex !important; 
                 max-width: 100% !important;
@@ -151,20 +152,11 @@
                 width: auto !important;
                 max-width: 100% !important;
                 height: auto !important;
-                max-height: 250px !important; /* 限制最大高度避免單頁溢出 */
+                max-height: 300px !important; /* ❗高度顯著加大(原250)，完美填補取消文字後的空間 */
                 display: block !important;
                 background-color: white !important;
                 padding: 6px !important;
                 border: 1px solid #e5e7eb !important;
-            }
-            
-            .live-caption-box {
-                font-family: 'LXGW WenKai TC', cursive, serif !important;
-                font-size: 15px !important;
-                line-height: 1.6 !important;
-                height: 35px !important;
-                overflow: hidden !important;
-                margin-top: 4px !important;
             }
             
             /* 縮減其他不必要的留白 */
@@ -187,9 +179,6 @@
             visibility: hidden !important;
             width: 0 !important;
             height: 0 !important;
-        }
-        body.is-printing .live-caption-box::placeholder {
-            color: transparent !important;
         }
     </style>
 </head>
@@ -226,7 +215,7 @@
                 <p class="font-serif text-2xl leading-[2.6] text-gray-800 italic tracking-wide">
                     「致我最尊貴的貴賓們：<br/><br/>
                     旅程的長度可以用天數計算，但我們共同創造的回憶，卻是超越時間的無價之寶。這本紀念冊，是我為您準備的心意。這裡記錄了萊茵河畔的微風，與我們舉杯共飲的歡笑。<br/><br/>
-                    請在此上傳您的視角，讓我為您的每一個精彩瞬間，寫下最真摯的註解。期待下一次，我們再次一同探索美麗的世界。」
+                    請在此上傳您的視角，讓我為您的每一個精彩瞬間，留存最純粹的畫面。期待下一次，我們再次一同探索美麗的世界。」
                 </p>
                 <div class="flex justify-center items-center gap-6 mt-16">
                     <p class="font-cormorant font-black text-2xl text-[#8B2635]">—— Your Private Escort, Carl 敬上</p>
@@ -254,7 +243,7 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -389,11 +378,24 @@
                     document.getElementById('status-dot').style.background = '#ef4444';
                 }
 
-                onAuthStateChanged(auth, async (u) => {
-                    if (!u) {
-                        try { await signInAnonymously(auth); } catch(e) { setSyncStatus('error'); }
-                    } else {
-                        user = u;
+                const initAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (e) {
+                        console.error("Auth error:", e);
+                        setSyncStatus('error_auth_disabled');
+                    }
+                };
+
+                initAuth();
+
+                onAuthStateChanged(auth, (u) => {
+                    user = u;
+                    if (user) {
                         setSyncStatus('idle');
                         initSync();
                     }
@@ -402,7 +404,7 @@
         } catch(e) { setSyncStatus('local'); }
 
         function initSync() {
-            if (!db) return;
+            if (!db || !user) return;
             const daysCollection = collection(db, 'artifacts', appId, 'public', 'data', 'days');
             onSnapshot(daysCollection, (snapshot) => {
                 snapshot.forEach((docSnap) => {
@@ -414,7 +416,6 @@
             }, (err) => { setSyncStatus('error'); });
         }
 
-        // 終極解法：將白底與內邊距直接加在 img 標籤上，100%保證所有瀏覽器 (含 Firefox) 外框絕對貼合照片像素
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
             if (!container) return;
@@ -423,22 +424,19 @@
             items.forEach(el => el.remove());
 
             const photos = data.userPhotos || [];
-            const caps = data.captions || {};
 
             photos.forEach((base64, i) => {
                 const div = document.createElement('div');
-                div.className = 'moment-item moment-col flex flex-col gap-3 justify-start items-center w-full';
+                div.className = 'moment-item moment-col flex flex-col justify-start items-center w-full';
                 
-                // 完全捨棄 div 容器的樣式，直接用 img 的 padding/background 來做相框
+                // 移除了文字註解 (TextArea)，將空間完全釋放給照片
+                // 電腦版高度顯著提升 (max-h-[360px])，列印時也完美利用省下的高度
                 div.innerHTML = `
                     <div class="photo-container relative inline-flex justify-center items-center max-w-full mx-auto group">
-                        <img src="${base64}" class="bg-white p-[6px] border border-gray-200 shadow-sm rounded-sm block w-auto h-auto max-w-full max-h-[280px]" />
+                        <img src="${base64}" class="bg-white p-[6px] border border-gray-200 shadow-sm rounded-sm block w-auto h-auto max-w-full max-h-[360px]" />
                         <button class="remove-photo-btn no-print print:hidden absolute -top-3 -right-3 z-20" data-day="${day}" data-idx="${i}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
-                    </div>
-                    <div class="pl-4 border-l-[3px] border-[#8B2635]/20 mt-1 w-full">
-                        <textarea class="live-caption-box w-full bg-transparent border-none p-0 text-[13px] italic leading-relaxed text-gray-800 font-serif outline-none resize-none" rows="2" data-day="${day}" data-idx="${i}" placeholder="在此填寫回憶註解...">${caps[i] || ""}</textarea>
                     </div>
                 `;
                 const label = container.querySelector('.upload-label-' + day);
@@ -475,7 +473,7 @@
         }
 
         document.addEventListener('change', async (e) => {
-            if (e.target?.classList?.contains('live-upload-input')) {
+            if (e.target && e.target.classList && e.target.classList.contains('live-upload-input')) {
                 const day = e.target.dataset.day;
                 const files = Array.from(e.target.files);
                 if (!files.length) return;
@@ -499,14 +497,14 @@
         });
 
         document.addEventListener('click', async (e) => {
-            const removeBtn = e.target?.closest?.('.remove-photo-btn');
+            const removeBtn = (e.target && typeof e.target.closest === 'function') ? e.target.closest('.remove-photo-btn') : null;
             if (removeBtn && user && db) {
                 setSyncStatus('syncing');
                 const day = removeBtn.dataset.day;
                 const idx = parseInt(removeBtn.dataset.idx);
                 const dayData = remoteData[day] || {};
                 const existingPhotos = dayData.userPhotos || [];
-                const existingCaptions = dayData.captions || {};
+                const existingCaptions = dayData.captions || {}; // 保留舊的 caption 屬性避免破壞雲端資料結構
                 
                 const newPhotos = existingPhotos.filter((_, i) => i !== idx);
                 const updatedCaptions = {};
@@ -521,20 +519,6 @@
                 } catch(err) { setSyncStatus('error'); }
             }
         });
-
-        document.addEventListener('blur', async (e) => {
-            if (e.target?.classList?.contains('live-caption-box') && user && db) {
-                setSyncStatus('syncing');
-                const day = e.target.dataset.day;
-                const idx = parseInt(e.target.dataset.idx);
-                const currentCaptions = { ...((remoteData[day] || {}).captions || {}), [idx]: e.target.value };
-                
-                try {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day), { captions: currentCaptions }, { merge: true });
-                    setSyncStatus('saved');
-                } catch(err) { setSyncStatus('error'); }
-            }
-        }, true);
 
         const hideElementsForPrint = () => document.body.classList.add('is-printing');
         const restoreElementsAfterPrint = () => document.body.classList.remove('is-printing');
