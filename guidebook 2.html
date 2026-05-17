@@ -247,12 +247,12 @@
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
-              apiKey: "AIzaSyCJ7Zln_xHCR02DQz8LbNRUqTcNVJm5fSo",
-              authDomain: "viva-1st.firebaseapp.com",
-              projectId: "viva-1st",
-              storageBucket: "viva-1st.firebasestorage.app",
-              messagingSenderId: "831844344576",
-              appId: "1:831844344576:web:317745d6e257f9b5f5c9e5",
+            apiKey: "AIzaSyCJ7Zln_xHCR02DQz8LbNRUqTcNVJm5fSo",
+            authDomain: "viva-1st.firebaseapp.com",
+            projectId: "viva-1st",
+            storageBucket: "viva-1st.firebasestorage.app",
+            messagingSenderId: "831844344576",
+            appId: "1:831844344576:web:317745d6e257f9b5f5c9e5",
         };
         const appId = "premium-rhine-viva-master-v1";
 
@@ -340,11 +340,11 @@
 
         const statusEl = document.createElement('div');
         statusEl.className = 'no-print';
-        statusEl.style.cssText = 'position:fixed;top:15px;left:15px;z-index:9999;background:white;padding:10px 20px;border-radius:30px;font-size:12px;font-family:sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;font-weight:bold;transition:all 0.5s ease-in-out; opacity:0; pointer-events:none;';
-        statusEl.innerHTML = '<div id="status-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;"></div><span id="status-text">初始化雲端...</span>';
+        statusEl.style.cssText = 'position:fixed;top:15px;left:15px;z-index:9999;background:white;padding:10px 20px;border-radius:30px;font-size:12px;font-family:sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;font-weight:bold;transition:all 0.5s ease-in-out; opacity:0; pointer-events:none; max-width:90vw; word-wrap:break-word;';
+        statusEl.innerHTML = '<div id="status-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0;"></div><span id="status-text">初始化雲端...</span>';
         document.body.appendChild(statusEl);
 
-        function setSyncStatus(status) {
+        function setSyncStatus(status, detail = '') {
             const dot = document.getElementById('status-dot');
             const txt = document.getElementById('status-text');
             
@@ -362,7 +362,7 @@
             else if (status === 'error_auth_disabled') { dot.style.background = '#ef4444'; txt.innerText = '錯誤：請在 Firebase 啟用「匿名登入」'; }
             else if (status === 'error_firestore_disabled') { dot.style.background = '#ef4444'; txt.innerText = '權限錯誤：請至 Firebase 將 Rules 設為 true'; }
             else if (status === 'error_network') { dot.style.background = '#ef4444'; txt.innerText = '連線超時：請關閉防護套件或切換網路'; }
-            else if (status === 'error') { dot.style.background = '#ef4444'; txt.innerText = '同步失敗 - 請確認網路與設定'; }
+            else if (status === 'error') { dot.style.background = '#ef4444'; txt.innerText = '錯誤代碼: ' + (detail || '未知錯誤'); }
             else if (status === 'local') { dot.style.background = '#f59e0b'; txt.innerText = '本地模式 (Firebase 未配置)'; }
         }
 
@@ -385,7 +385,6 @@
                             try {
                                 await signInWithCustomToken(auth, __initial_auth_token);
                             } catch (tokenErr) {
-                                console.warn("自定義 Token 不匹配，自動降級為匿名登入...", tokenErr);
                                 await signInAnonymously(auth);
                             }
                         } else {
@@ -393,7 +392,7 @@
                         }
                     } catch (e) {
                         console.error("Auth error:", e);
-                        setSyncStatus('error_auth_disabled');
+                        setSyncStatus('error', e.code || e.message);
                     }
                 };
 
@@ -426,7 +425,7 @@
                 } else if (err.code === 'unavailable' || err.message.includes('10 seconds')) {
                     setSyncStatus('error_network');
                 } else {
-                    setSyncStatus('error');
+                    setSyncStatus('error', err.code || err.message);
                 }
             });
         }
@@ -506,7 +505,7 @@
                 try {
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day), { userPhotos: newPhotos }, { merge: true });
                     setSyncStatus('saved');
-                } catch(err) { setSyncStatus('error'); }
+                } catch(err) { setSyncStatus('error', err.code || err.message); }
                 e.target.value = '';
             }
         });
@@ -531,7 +530,7 @@
                 try {
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'days', 'day_' + day), { userPhotos: newPhotos, captions: updatedCaptions }, { merge: true });
                     setSyncStatus('saved');
-                } catch(err) { setSyncStatus('error'); }
+                } catch(err) { setSyncStatus('error', err.code || err.message); }
             }
         });
 
