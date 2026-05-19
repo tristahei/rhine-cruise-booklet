@@ -288,8 +288,8 @@
 
         initialItinerary.forEach(item => {
             const dayNum = item.day < 10 ? `0${item.day}` : item.day;
-            // 第 1, 10, 11 天都被設定為「無上傳照片」的滿版大圖版面
-            const isNoMoments = (item.day === 1 || item.day === 10 || item.day === 11);
+            // 嚴格規定：第 1, 10, 11 天都被設定為「無上傳照片」的滿版大圖版面
+            const isNoMoments = [1, 10, 11].includes(item.day);
             const articleClass = isNoMoments ? "no-moments" : "has-moments";
             
             const momentsSection = !isNoMoments ? `
@@ -446,6 +446,7 @@
 
         function updateDOM(day, data) {
             const container = document.getElementById('moments-' + day);
+            // 防護：如果這個天數在畫面上本來就沒有 moments 區塊 (例如第 10 天)，直接中斷不執行
             if (!container) return;
             
             const items = container.querySelectorAll('.moment-item');
@@ -457,8 +458,6 @@
                 const div = document.createElement('div');
                 div.className = 'moment-item moment-col flex flex-col justify-start items-center w-full';
                 
-                // 移除了文字註解 (TextArea)，將空間完全釋放給照片
-                // 電腦版高度顯著提升 (max-h-[360px])，列印時也完美利用省下的高度
                 div.innerHTML = `
                     <div class="photo-container relative inline-flex justify-center items-center max-w-full mx-auto group">
                         <img src="${base64}" class="bg-white p-[6px] border border-gray-200 shadow-sm rounded-sm block w-auto h-auto max-w-full max-h-[360px]" />
@@ -475,9 +474,6 @@
             if (uploadLabel) uploadLabel.style.display = photos.length >= 4 ? 'none' : 'flex';
         }
 
-        // ==========================================
-        // 終極壓縮引擎：防護雙維度超大圖片，保證小於 1MB
-        // ==========================================
         async function compressImage(file, maxSize = 600) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -490,7 +486,6 @@
                         let width = img.width;
                         let height = img.height;
                         
-                        // 強制縮小最長邊，確保高畫質直圖或橫圖都不會過大
                         if (width > height) {
                             if (width > maxSize) {
                                 height = Math.round((height * maxSize) / width);
@@ -507,12 +502,10 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         
-                        // 填滿白底，防止透明 PNG 變成佔用極大容量的黑底
                         ctx.fillStyle = '#FFFFFF';
                         ctx.fillRect(0, 0, width, height);
                         
                         ctx.drawImage(img, 0, 0, width, height);
-                        // 強制轉為 JPEG，並使用 0.5 壓縮率，保證 4 張圖總和遠小於 1MB
                         resolve(canvas.toDataURL('image/jpeg', 0.5)); 
                     };
                 };
@@ -552,7 +545,7 @@
                 const idx = parseInt(removeBtn.dataset.idx);
                 const dayData = remoteData[day] || {};
                 const existingPhotos = dayData.userPhotos || [];
-                const existingCaptions = dayData.captions || {}; // 保留舊的 caption 屬性避免破壞雲端資料結構
+                const existingCaptions = dayData.captions || {}; 
                 
                 const newPhotos = existingPhotos.filter((_, i) => i !== idx);
                 const updatedCaptions = {};
