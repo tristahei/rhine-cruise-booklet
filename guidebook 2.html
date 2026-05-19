@@ -82,7 +82,7 @@
             }
 
             /* --------------------------------------
-               情境 1：無上傳照片的頁面 (第1天與最後1天)
+               情境 1：無上傳照片的頁面 (第1天、第10天與最後1天)
                -------------------------------------- */
             article.no-moments { justify-content: center !important; padding-top: 0 !important; }
             article.no-moments .text-8xl { font-size: 6rem !important; }
@@ -98,7 +98,7 @@
             article.no-moments .photo-wrapper img { max-height: 350px !important; height: 350px !important; }
 
             /* --------------------------------------
-               情境 2：常規有回憶照片的頁面 (第2~10天)
+               情境 2：常規有回憶照片的頁面 (第2~9天)
                -------------------------------------- */
             article.has-moments { padding-top: 6mm !important; }
             article.has-moments .text-8xl { font-size: 4rem !important; line-height: 1 !important; }
@@ -288,7 +288,8 @@
 
         initialItinerary.forEach(item => {
             const dayNum = item.day < 10 ? `0${item.day}` : item.day;
-            const isNoMoments = (item.day === 1 || item.day === 11);
+            // 第 1, 10, 11 天都被設定為「無上傳照片」的滿版大圖版面
+            const isNoMoments = (item.day === 1 || item.day === 10 || item.day === 11);
             const articleClass = isNoMoments ? "no-moments" : "has-moments";
             
             const momentsSection = !isNoMoments ? `
